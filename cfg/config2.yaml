@@ -1,0 +1,42 @@
+
+app1:
+    +/app1_2: [app1_2_file]
+
++app2: [app2_file,app2bis_file]
+
+#EXPERIMENT PARAMETERS
+#NOT SAVED AS PART OF THE CONFIGURATION
+__exp__:
+    name: prova #name of the experiment, optional, default = "experiment_name"
+    # project_folder: ../ #project folder, used to locate folders, optional, default = "../"
+    # key_len: 16 #Length of experiment key, optional, default = 16
+    # key_prefix: "" #Prefix for experiment key, optional, default = ""
+
+#maybe should create __yaml__ key --> __imports__ and other stuff
+
+
+# if "-" or "--" at the start:
+#     use argparse:
+#         uses all argparse add_argument functions:
+#             default: especially useful --> used also to compensate previous experiments
+#         other keys:
+#             value: represent the current value
+#             eval: if use eval for transformation
+# if "+" at the start:
+#     load another yaml_file:
+#         inside <key> folder
+#         with <value> name
+# if "^" at the start:
+#     raise to previous configuration
+# if key="_global_":
+#     raise to global config
+# if no "special" character:
+#     interpret as key-value pair
+
+#STILL USED?
+#${} : reference to another key
+
+#NOT USED ANYMORE
+#sweep parameter --> sweeps parameter
+#repeat n --> repeats successive pipeline n times
+

@@ -1,0 +1,8 @@
+-/foo_int1:
+    value: 123
+
+^/foo_int2: 123
+
+__global__:
+    app1:
+        app_glob2: "glob2"
