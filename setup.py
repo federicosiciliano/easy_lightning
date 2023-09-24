@@ -10,15 +10,15 @@ if os.path.isfile("requirements.txt"):
         install_requires = f.read().splitlines()
 
 setup(
-    name='your_combined_project_name',  # Replace with your desired project name
-    packages=['exp_utils', 'data_utils'],  # List all packages from both projects
-    description='Combined Description',  # Replace with a combined project description
+    name='Easy Lightning', 
+    packages=['exp_utils', 'data_utils', 'torch_utils'],  # List all packages from all projects
+    description='Easy Lightning: Simplify AI-Deep learning with PyTorch Lightning',  
     long_description=long_description,
     long_description_content_type="text/markdown",
     version='0.0.1',
     install_requires=install_requires,
-    url='https://github.com/your-github-url',  # Replace with your GitHub repository URL
-    author='siciliano-diag',
-    author_email='siciliano@diag.uniroma1.it',
-    keywords=['pip', 'MachineLearning']
+    url='https://github.com/fed21',  # Replace with your GitHub repository URL
+    author='Federico Siciliano, Federico Carmignani',
+    author_email='siciliano@diag.uniroma1.it, carmignanifederico@gmail.com',
+    keywords=['DeepLearning', 'MachineLearning', 'PyTorch', 'Lightning', 'AI']
 )
