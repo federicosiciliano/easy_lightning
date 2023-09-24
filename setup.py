@@ -1,5 +1,4 @@
 import os
-
 from setuptools import setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -11,22 +10,15 @@ if os.path.isfile("requirements.txt"):
         install_requires = f.read().splitlines()
 
 setup(
-    name='exp_utils',
-    packages=['exp_utils'],
-    description='Experiments utils',
+    name='your_combined_project_name',  # Replace with your desired project name
+    packages=['exp_utils', 'data_utils'],  # List all packages from both projects
+    description='Combined Description',  # Replace with a combined project description
     long_description=long_description,
     long_description_content_type="text/markdown",
     version='0.0.1',
     install_requires=install_requires,
-    url='https://github.com/siciliano-diag/exp_utils.git',
+    url='https://github.com/your-github-url',  # Replace with your GitHub repository URL
     author='siciliano-diag',
     author_email='siciliano@diag.uniroma1.it',
-    keywords=['pip','MachineLearning']
-    )
-
-
-
-
-#license='MIT',
-#project_urls = {"Bug Tracker": "https://github.com/mike-huls/toolbox/issues"},
-
+    keywords=['pip', 'MachineLearning']
+)
