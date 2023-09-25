@@ -19,4 +19,23 @@
 
 - 🛡️ **Error Prevention:** With experiment IDs and organized project management, Easy Lightning ensures that your work remains clean and error-free, even as your projects scale.
 
+## 📁 Files
+
+Here is a list of the important files included in this project:
+
+1. **setup.py**: This file is used for configuring and describing the Python package. It specifies package metadata, dependencies, and other essential information for distribution.
+
+2. **requirements.txt**: This file lists the required Python packages and their versions. It helps ensure that the necessary dependencies are installed when working with this project. Currently, it includes:
+
+   - PyTorch: A popular deep learning library.
+   - PyTorch Lightning: A lightweight PyTorch wrapper for simplifying deep learning code.
+
+3. **README.md**: You are currently reading this file! It provides an overview of the project and instructions on how to use it.
+
+## 🧑‍🚀 Authors
+
+- **Federico Siciliano**: Researcher in Data Science at the University of La Sapienza of Rome.
+- **Federico Carmignani**: Master's Thesis Student in Engineering in Computer Science at the University of La Sapienza of Rome and Software Engineer at Sytel Reply.
+
+
 Start your deep learning journey with Easy Lightning today and experience a new level of simplicity and efficiency in creating and configuring AI-Deep learning notebooks.

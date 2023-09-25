@@ -1,2 +1,10 @@
+# requirements.txt
+
+# List of required Python packages for your project
+# Each package should be listed on a separate line
+
+# PyTorch: A popular deep learning library
 torch
+
+# PyTorch Lightning: A lightweight PyTorch wrapper for organizing and simplifying deep learning code
 pytorch_lightning

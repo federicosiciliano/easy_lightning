@@ -1,5 +1,7 @@
 foo_str1_2: app2_foo
 
+# __global__ section defines global configurations that apply to all applications.
 __global__:
     app1:
+        # Define a global parameter /app_glob1_2 with the value "glob1_2".
         /app_glob1_2: "glob1_2"
