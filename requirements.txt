@@ -5,9 +5,15 @@
 
 # PyTorch: A popular deep learning library
 torch
+torchvision
+torchmetrics
 
 # PyTorch Lightning: A lightweight PyTorch wrapper for organizing and simplifying deep learning code
 pytorch_lightning
 
 # YAML handling
 yaml
+
+# Scipy and Sklearn for statistics
+scipy
+sklearn

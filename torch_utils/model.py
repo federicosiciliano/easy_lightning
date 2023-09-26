@@ -1,14 +1,25 @@
+# Import necessary libraries
 import torch
 import pytorch_lightning as pl
 
+# Define the BaseNN class
 class BaseNN(pl.LightningModule):
     def __init__(self, main_module, loss, optimizer, metrics={}, log_params={}, **kwargs):
         super().__init__()
 
+        # Store the main neural network module
         self.main_module = main_module
 
+        # Store the optimizer function
         self.optimizer = optimizer
 
+        # Store the primary loss function
+        self.loss = loss
+
+        # Define the metrics to be used for evaluation
+        self.metrics = metrics
+
+        # Prototype for customizing logging for multiple losses (if needed)
         # self.losses = loss
         # self.loss_log_params = {}
         # self.loss_weights = {}
@@ -22,14 +33,11 @@ class BaseNN(pl.LightningModule):
         #         self.loss_log_params[loss_name] = {}
         #         self.loss_weights[loss_name] = 1.0
 
-        self.loss = loss
 
-        self.metrics = metrics
-
-        # Prototype for log different for metric
+        # Prototype for customizing logging for multiple metrics (if needed)
         # self.metrics = {}
         # self.metrics_log_params = {}
-        # for metric_name,metric_obj in self.metrics.items():
+        # for metric_name, metric_obj in self.metrics.items():
         #     if isinstance(metric_obj, dict):
         #         self.metrics[metric_name] = metric_obj["metric"]
         #         self.metrics_log_params[metric_name] = metric_obj.get("log_params", {})
@@ -37,17 +45,21 @@ class BaseNN(pl.LightningModule):
         #         self.metrics[metric_name] = metric_obj
         #         self.metrics_log_params[metric_name] = {}
 
+        # Define a custom logging function
         self.custom_log = lambda name, value: self.log(name, value, **log_params)
 
+    # Define the forward pass of the neural network
     def forward(self, x):
         return self.main_module(x)
 
+    # Configure the optimizer for training
     def configure_optimizers(self):
         optimizer = self.optimizer(self.parameters())
         return optimizer
 
+    # Define a step function for processing a batch
     def step(self, batch, batch_idx, split):
-        x,y = batch
+        x, y = batch
 
         y_hat = self(x)
 
@@ -55,42 +67,45 @@ class BaseNN(pl.LightningModule):
 
         self.custom_log(split+'_loss', loss)
 
-        #on_step=False, on_epoch=True, logger=True
-
-        #compute other metrics
-        for metric_name,metric_func in self.metrics.items():
-            metric_value = metric_func(y_hat,y)
+        # Compute other metrics
+        for metric_name, metric_func in self.metrics.items():
+            metric_value = metric_func(y_hat, y)
             self.custom_log(split+'_'+metric_name, metric_value)
-        
+
         return loss
 
+    # Training step
     def training_step(self, batch, batch_idx): return self.step(batch, batch_idx, "train")
 
+    # Validation step
     def validation_step(self, batch, batch_idx, dataloader_idx=0): return self.step(batch, batch_idx, "val")
-        
-    def test_step(self,batch,batch_idx): return self.step(batch, batch_idx, "test")
 
+    # Test step
+    def test_step(self, batch, batch_idx): return self.step(batch, batch_idx, "test")
+
+# Define functions for getting and loading torchvision models
 def get_torchvision_model(*args, **kwargs): return torchvision_utils.get_torchvision_model(*args, **kwargs)
 
 def load_torchvision_model(*args, **kwargs): return torchvision_utils.load_torchvision_model(*args, **kwargs)
 
-
+# Define an Identity module
 class Identity(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        
+
     def forward(self, x):
         return x
 
-
+# Define a LambdaLayer module
 class LambdaLayer(torch.nn.Module):
     def __init__(self, lambd):
         super(LambdaLayer, self).__init__()
         self.lambd = lambd
+
     def forward(self, x):
         return self.lambd(x)
 
-
+# Class MLP (Multi-Layer Perceptron) (commented out for now)
 # class MLP(BaseNN):
 #     def __init__(self, input_size, output_size, neurons_per_layer, activation_function=None, lr=None, loss = None, acc = None, **kwargs):
 #         super().__init__()
@@ -105,5 +120,5 @@ class LambdaLayer(torch.nn.Module):
 #         layers.append(torch.nn.Linear(in_size, output_size))
 #         self.main_module = torch.nn.Sequential(*layers)
 
-
-from . import torchvision_utils #put here otherwise circular import
+# Import additional libraries
+from . import torchvision_utils  # put here otherwise circular import
