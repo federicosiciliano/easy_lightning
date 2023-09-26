@@ -19,18 +19,55 @@
 
 - 🛡️ **Error Prevention:** With experiment IDs and organized project management, Easy Lightning ensures that your work remains clean and error-free, even as your projects scale.
 
-## 📁 Files
+## 📁 Important Files and Folders in the Project
 
-Here is a list of the important files included in this project:
+Below is an outline of key files and folders you'll find in this project, along with their purposes:
 
-1. **setup.py**: This file is used for configuring and describing the Python package. It specifies package metadata, dependencies, and other essential information for distribution.
+### Files
 
-2. **requirements.txt**: This file lists the required Python packages and their versions. It helps ensure that the necessary dependencies are installed when working with this project. Currently, it includes:
+1. **setup.py**
+    - Setup script for Python's setuptools. Specifies package metadata, dependencies, and other distribution essentials.
 
-   - PyTorch: A popular deep learning library.
-   - PyTorch Lightning: A lightweight PyTorch wrapper for simplifying deep learning code.
+2. **requirements.txt**
+    - Lists required Python packages and their versions. Ensures that necessary dependencies are installed.
+  
+    - Currently includes:
+        - PyTorch: Popular deep learning library.
+        - PyTorch Lightning: Lightweight PyTorch wrapper.
 
-3. **README.md**: You are currently reading this file! It provides an overview of the project and instructions on how to use it.
+3. **README.md**
+    - Provides an overview of the project and usage instructions.
+
+4. **.gitignore**
+    - Specifies files and folders that should be ignored by Git, ensuring that unnecessary or sensitive data is not included in the version control.
+
+### Folders
+
+1. **data_utils**
+    - Contains utilities for data loading, file management, data and data structure management, data splitting, and statistics.
+
+2. **exp_utils**
+    - Manages experiments by defining unique IDs based on their configuration.
+    - Allows for hashing of each ID to check for previously conducted experiments.
+    - Excludes GPU/CPU usage and training modes from the experiment ID.
+    - Saves experiments in a specific file along with their relative configuration.
+    - Includes methods for parsing YAML configs and handles special characters used in them (e.g., through `var.py`).
+
+3. **torch_utils**
+    - Includes functions for metrics, loading models, and creating trainers in PyTorch Lightning.
+    - Defines steps, loss, optimizer, and other parameters to use.
+    - Sets callbacks and dataloaders.
+    - Manages TorchVision models, allowing you to load them and modify their internal modules if necessary.
+    - Also includes utilities for training and testing the model, as well as saving and reading logs.
+
+4. **cfg**
+    - Contains demo configurations used in testing phase of this repo.
+
+5. **ntb**
+    - Houses three notebooks for testing the utilities offered by the three utility folders.
+    - Also includes a notebook with information about the objectives and logic used in the implementation.
+
+By understanding the role of each file and folder, you'll be better equipped to navigate and work on the project.
 
 ## 🧑‍🚀 Authors
 

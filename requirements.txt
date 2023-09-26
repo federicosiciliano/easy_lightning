@@ -17,3 +17,6 @@ yaml
 # Scipy and Sklearn for statistics
 scipy
 sklearn
+
+# Pandas
+pandas

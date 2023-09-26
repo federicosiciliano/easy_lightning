@@ -18,7 +18,7 @@ data:
     split_keys:
       "train_x": ["train_x", "val_x"]
       "train_y": ["train_y", "val_y"]
-    train_sizes: [100,100] #for prototyping
+    train_sizes: [100,100] # For prototyping
     test_sizes: [0.2]
       #int: number of samples, float: percentage of samples
       #all values are relative to remaining data after each split
@@ -42,7 +42,7 @@ data:
 
 +model: resnet
 
-#EXPERIMENT PARAMETERS - NOT SAVED AS PART OF THE CONFIGURATION
+# EXPERIMENT PARAMETERS - NOT SAVED AS PART OF THE CONFIGURATION
 __exp__:
     name: prova #name of the experiment, optional, default = "experiment_name"
     # project_folder: ../ #project folder, used to locate folders, optional, default = "../"

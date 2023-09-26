@@ -66,10 +66,3 @@ __exp__:
 # if no "special" character:
 #     interpret as key-value pair
 
-#STILL USED?
-#${} : reference to another key
-
-#NOT USED ANYMORE
-#sweep parameter --> sweeps parameter
-#repeat n --> repeats successive pipeline n times
-
