@@ -699,162 +699,162 @@ class ConfigObject(dict):
         return value
     
 
-def __setitem__(self, relative_key, set_value):
-    """
-    Set a value in the configuration using a relative key.
+    def __setitem__(self, relative_key, set_value):
+        """
+        Set a value in the configuration using a relative key.
 
-    This method allows you to set nested values using dot notation.
+        This method allows you to set nested values using dot notation.
 
-    Example:
-    cfg = ConfigObject({})
-    cfg["key1.nested_key"] = "nested_value"
+        Example:
+        cfg = ConfigObject({})
+        cfg["key1.nested_key"] = "nested_value"
 
-    :param relative_key: The relative key to access and set values.
-    :param set_value: The value to set.
-    """
+        :param relative_key: The relative key to access and set values.
+        :param set_value: The value to set.
+        """
 
-    no_save = False  # Flag to indicate whether to mark the key as nosave
+        no_save = False  # Flag to indicate whether to mark the key as nosave
 
-    # Check if the relative key starts with yaml_nosave_char
-    if relative_key[0] == yaml_nosave_char:
-        relative_key = relative_key[1:]  # Remove the nosave character
-        no_save = True
+        # Check if the relative key starts with yaml_nosave_char
+        if relative_key[0] == yaml_nosave_char:
+            relative_key = relative_key[1:]  # Remove the nosave character
+            no_save = True
 
-    keys = relative_key.split(".")  # Split the relative key by dot
+        keys = relative_key.split(".")  # Split the relative key by dot
 
-    value = self  # Start with the entire configuration as the initial value
+        value = self  # Start with the entire configuration as the initial value
 
-    # Traverse the keys, creating nested dictionaries as needed
-    for key in keys[:-1]:
-        if isinstance(value, dict):
-            # If the current value is a dictionary, set it as the value associated with the key
-            value = value.setdefault(key, {})
-        else:
-            # If the current value is not a dictionary, assume it's a list and use the key as an index
-            value = value[int(key)]
+        # Traverse the keys, creating nested dictionaries as needed
+        for key in keys[:-1]:
+            if isinstance(value, dict):
+                # If the current value is a dictionary, set it as the value associated with the key
+                value = value.setdefault(key, {})
+            else:
+                # If the current value is not a dictionary, assume it's a list and use the key as an index
+                value = value[int(key)]
 
-    # Set the final key in the configuration to the specified value
-    dict.__setitem__(value, keys[-1], set_value)
+        # Set the final key in the configuration to the specified value
+        dict.__setitem__(value, keys[-1], set_value)
 
-    if no_save:
-        # Mark the key as nosave in the universal configuration
-        self[experiment_universal_key][experiment_nosave_key][relative_key] = None
+        if no_save:
+            # Mark the key as nosave in the universal configuration
+            self[experiment_universal_key][experiment_nosave_key][relative_key] = None
 
-    
-def pop(self, relative_key, default_value=None):
-    """
-    Remove and return a value from the configuration using a relative key.
+        
+    def pop(self, relative_key, default_value=None):
+        """
+        Remove and return a value from the configuration using a relative key.
 
-    This method allows you to remove values using dot notation and return the removed value.
+        This method allows you to remove values using dot notation and return the removed value.
 
-    Example:
-    cfg = ConfigObject({"key1": {"nested_key": "nested_value"}})
-    removed_value = cfg.pop("key1.nested_key")
+        Example:
+        cfg = ConfigObject({"key1": {"nested_key": "nested_value"}})
+        removed_value = cfg.pop("key1.nested_key")
 
-    :param relative_key: The relative key to access and remove values.
-    :param default_value: The value to return if the key is not found (default is None).
-    :return: The removed value or the default value if the key is not found.
-    """
-    
-    keys = relative_key.split(".")  # Split the relative key by dot
-    value = self  # Start with the entire configuration as the initial value
-    
-    # Traverse the keys to locate the value to remove
-    for key in keys[:-1]:
-        if isinstance(value, dict):
-            # If the current value is a dictionary, get the value associated with the key
-            value = value.get(key, {})  # You can specify a default value here instead of an empty dictionary
-        else:
-            # If the current value is not a dictionary, assume it's a list and use the key as an index
-            value = value[int(key)]
-    
-    # Remove the final key from the configuration and return its value
-    return_value = value.get(keys[-1], default_value)
-    dict.__delitem__(value, keys[-1])
-    
-    return return_value
-
-
-def sweep(self, relative_key):
-    """
-    Iterate through and yield values of a list-like key in the configuration.
-
-    This method allows you to sweep through a list-like key, such as when multiple values are stored under the same key.
-
-    Example:
-    cfg = ConfigObject({"key1": [1, 2, 3]})
-    for value in cfg.sweep("key1"):
-        print(value)
-
-    :param relative_key: The relative key to access and sweep through.
-    :yield: Each value associated with the relative key.
-    """
-    
-    values = self[relative_key]  # Get the list-like values from the configuration
-    for value in values:
-        self[relative_key] = value  # Set the current value to the relative key
-        yield value  # Yield the current value
-    self[relative_key] = values  # Restore the original values in the configuration
+        :param relative_key: The relative key to access and remove values.
+        :param default_value: The value to return if the key is not found (default is None).
+        :return: The removed value or the default value if the key is not found.
+        """
+        
+        keys = relative_key.split(".")  # Split the relative key by dot
+        value = self  # Start with the entire configuration as the initial value
+        
+        # Traverse the keys to locate the value to remove
+        for key in keys[:-1]:
+            if isinstance(value, dict):
+                # If the current value is a dictionary, get the value associated with the key
+                value = value.get(key, {})  # You can specify a default value here instead of an empty dictionary
+            else:
+                # If the current value is not a dictionary, assume it's a list and use the key as an index
+                value = value[int(key)]
+        
+        # Remove the final key from the configuration and return its value
+        return_value = value.get(keys[-1], default_value)
+        dict.__delitem__(value, keys[-1])
+        
+        return return_value
 
 
-def sweep_additions(self, relative_key, config_path="../cfg"):
-    """
-    Iterate through and yield values of a list-like key with additional configurations.
+    def sweep(self, relative_key):
+        """
+        Iterate through and yield values of a list-like key in the configuration.
 
-    This method allows you to sweep through a list-like key, such as when multiple values are stored under the same key,
-    and for each value, load and merge additional configurations from specified paths.
+        This method allows you to sweep through a list-like key, such as when multiple values are stored under the same key.
 
-    Example:
-    cfg = ConfigObject({"key1": [1, 2, 3]})
-    for value in cfg.sweep_additions("key1"):
-        print(value)
+        Example:
+        cfg = ConfigObject({"key1": [1, 2, 3]})
+        for value in cfg.sweep("key1"):
+            print(value)
 
-    :param relative_key: The relative key to access and sweep through.
-    :param config_path: The path to the directory containing additional configurations.
-    :yield: Each value associated with the relative key.
-    """
-    
-    addition_key = f"+{relative_key}"  # Construct the key for additional configurations
-    orig_cfg = deepcopy(self)  # Create a deep copy of the original configuration
-    
-    # Iterate through values of the list-like key
-    for value in self.sweep(addition_key):
-        # Handle additions for each value and yield the value
-        handle_additions(self, addition_key, value, config_path)
-        yield value  # Yield the current value
-        self = orig_cfg  # Restore the original configuration
-    
-    self = orig_cfg  # Restore the original configuration after sweeping
+        :param relative_key: The relative key to access and sweep through.
+        :yield: Each value associated with the relative key.
+        """
+        
+        values = self[relative_key]  # Get the list-like values from the configuration
+        for value in values:
+            self[relative_key] = value  # Set the current value to the relative key
+            yield value  # Yield the current value
+        self[relative_key] = values  # Restore the original values in the configuration
 
 
-def __delitem__(self, relative_key):
-    """
-    Delete a value from the configuration using a relative key.
+    def sweep_additions(self, relative_key, config_path="../cfg"):
+        """
+        Iterate through and yield values of a list-like key with additional configurations.
 
-    This method allows you to delete values using dot notation.
+        This method allows you to sweep through a list-like key, such as when multiple values are stored under the same key,
+        and for each value, load and merge additional configurations from specified paths.
 
-    Example:
-    cfg = ConfigObject({"key1": {"nested_key": "nested_value"}})
-    del cfg["key1.nested_key"]
+        Example:
+        cfg = ConfigObject({"key1": [1, 2, 3]})
+        for value in cfg.sweep_additions("key1"):
+            print(value)
 
-    :param relative_key: The relative key to access and delete values.
-    """
-    
-    value = self  # Start with the entire configuration as the initial value
-    
-    keys = relative_key.split(".")  # Split the relative key by dot
-    
-    # Traverse the keys to locate the value to delete
-    for key in keys[:-1]:
-        if isinstance(value, dict):
-            # If the current value is a dictionary, get the value associated with the key
-            value = value.get(key, {})  # You can specify a default value here instead of an empty dictionary
-        else:
-            # If the current value is not a dictionary, assume it's a list and use the key as an index
-            value = value[int(key)]
-    
-    # Delete the final key from the configuration
-    dict.__delitem__(value, keys[-1])
+        :param relative_key: The relative key to access and sweep through.
+        :param config_path: The path to the directory containing additional configurations.
+        :yield: Each value associated with the relative key.
+        """
+        
+        addition_key = f"+{relative_key}"  # Construct the key for additional configurations
+        orig_cfg = deepcopy(self)  # Create a deep copy of the original configuration
+        
+        # Iterate through values of the list-like key
+        for value in self.sweep(addition_key):
+            # Handle additions for each value and yield the value
+            handle_additions(self, addition_key, value, config_path)
+            yield value  # Yield the current value
+            self = orig_cfg  # Restore the original configuration
+        
+        self = orig_cfg  # Restore the original configuration after sweeping
+
+
+    def __delitem__(self, relative_key):
+        """
+        Delete a value from the configuration using a relative key.
+
+        This method allows you to delete values using dot notation.
+
+        Example:
+        cfg = ConfigObject({"key1": {"nested_key": "nested_value"}})
+        del cfg["key1.nested_key"]
+
+        :param relative_key: The relative key to access and delete values.
+        """
+        
+        value = self  # Start with the entire configuration as the initial value
+        
+        keys = relative_key.split(".")  # Split the relative key by dot
+        
+        # Traverse the keys to locate the value to delete
+        for key in keys[:-1]:
+            if isinstance(value, dict):
+                # If the current value is a dictionary, get the value associated with the key
+                value = value.get(key, {})  # You can specify a default value here instead of an empty dictionary
+            else:
+                # If the current value is not a dictionary, assume it's a list and use the key as an index
+                value = value[int(key)]
+        
+        # Delete the final key from the configuration
+        dict.__delitem__(value, keys[-1])
 
 
 def set_default_exp_key(cfg):
