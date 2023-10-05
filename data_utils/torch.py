@@ -2,7 +2,7 @@ import numpy as np
 import torchvision
 import torch
 
-def get_torchvision_data(name, root="../data/", download=True,
+def get_torchvision_data(name, root="../data/raw", download=True,
 						transform=torchvision.transforms.Compose([
 									torchvision.transforms.ToTensor(),
 					    			#torchvision.transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5))
