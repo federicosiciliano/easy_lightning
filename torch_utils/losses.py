@@ -8,7 +8,7 @@ import numpy as np
 class GCELoss(nn.Module):
 
     def __init__(self, q=0.7, k=0.5, trainset_size=50000):
-        super(TruncatedLoss, self).__init__()
+        super(GCELoss, self).__init__()
         self.q = q
         self.k = k
         self.weight = torch.nn.Parameter(data=torch.ones(trainset_size, 1), requires_grad=False)
