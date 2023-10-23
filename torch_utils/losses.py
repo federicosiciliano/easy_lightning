@@ -5,10 +5,6 @@ import math
 import numpy as np
 
 #https://github.com/AlanChou/Truncated-Loss
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
 class GCELoss(nn.Module):
 
     def __init__(self, q=0.7, k=0.5):
