@@ -8,6 +8,7 @@ from copy import deepcopy
 # Import modules and functions from local files
 from .model import BaseNN
 from . import metrics as custom_metrics
+from . import losses as custom_losses  # Ensure your custom losses are imported
 
 # Function to prepare data loaders
 def prepare_data_loaders(data, loader_params, split_keys={"train": ["train_x", "train_y"], "val": ["val_x", "val_y"], "test": ["test_x", "test_y"]}):                         
@@ -139,8 +140,16 @@ def prepare_loss(loss):
     else:
         raise NotImplementedError
 
+    # Check if the loss_name exists in torch.nn or custom_losses
+    if hasattr(torch.nn, loss_name):
+        loss_module = torch.nn
+    elif hasattr(custom_losses, loss_name):
+        loss_module = custom_losses
+    else:
+        raise NotImplementedError("The loss function is not found in torch.nn or custom_losses.")
+
     # Create the loss function using the name and parameters
-    return getattr(torch.nn, loss_name)(**loss_params)
+    return getattr(loss_module, loss_name)(**loss_params)
 
 
 def prepare_metrics(metrics_info):
