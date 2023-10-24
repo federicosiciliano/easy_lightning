@@ -35,12 +35,10 @@ class GCELoss(nn.Module):
         Compute the GCE loss between the predictions and targets.
         
         Args:
-            """
-            :param input: Predictions from the model (before softmax)
+            param input: Predictions from the model (before softmax)
                           shape: (batch_size, num_classes)
-            :param target: True labels (one-hot encoded)
+            param target: True labels (one-hot encoded)
                            shape: (batch_size, num_classes)
-            """
             
         Returns:
             torch.Tensor: The mean GCE loss.
