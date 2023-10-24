@@ -55,6 +55,23 @@ def train_model(trainer, model, loaders, train_key="train", val_key="val"):
     # Fit the model using the trainer
     trainer.fit(model, loaders[train_key], val_dataloaders)
 
+# Function to validate a PyTorch Lightning model
+def validate_model(trainer, model, loaders, loaders_key="val"):
+    """
+    Validate a PyTorch Lightning model.
+
+    Parameters:
+    - trainer: The PyTorch Lightning trainer.
+    - model: The PyTorch Lightning model to be validated.
+    - loaders: Dictionary of data loaders.
+    - loaders_key: Key for the validation data loader.
+
+    Returns:
+    - None
+    """
+    # Validate the model using the trainer
+    trainer.validate(model, loaders[loaders_key])
+
 # Function to test a PyTorch Lightning model
 def test_model(trainer, model, loaders, loaders_key="test"):
     """
