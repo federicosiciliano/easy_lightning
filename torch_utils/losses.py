@@ -67,7 +67,7 @@ std = 1e-9
 encoder_features = 512
 
 class NCODLoss(nn.Module):
-    def __init__(self, sample_labels, num_examp=50000, num_classes=100, ratio_consistency=0, ratio_balance=0, total epochs=4000):
+    def __init__(self, sample_labels, num_examp=50000, num_classes=100, ratio_consistency=0, ratio_balance=0, total_epochs=4000):
         super(NCODLoss, self).__init__()
 
         self.num_classes = num_classes
