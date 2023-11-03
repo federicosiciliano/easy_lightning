@@ -18,22 +18,30 @@ class ForwardNRL(nn.Module):
     def __init__(self, noise_rate, num_classes):
         super().__init__()
         # Use log softmax as it has better numerical properties
-        self.log_softmax = nn.LogSoftmax(dim=1)
         self.noise_rate = noise_rate
         self.num_classes = num_classes
-        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes).to(input.device)
+        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes)
 
     def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         
-        p = self.softmax(input)
-        p = torch.matrix(self.matrix, p)
-        p = torch.log(p)
+        p = F.softmax(input, dim=1)
         
-        p = p[torch.arange(p.shape[0]), target]
+        p = torch.matmul(p, self.matrix.t())
+        p = torch.log(p)
+        print(p.size())
+        res = p * target
+        res = torch.mean(torch.sum(res, dim=1))
               
-        loss = -p
+        loss = -res
 
         return torch.mean(loss)
+    
+    def _construct_matrix(self, noise_rate, num_classes):
+        diagonal = 1 - noise_rate
+        rest = noise_rate / (num_classes - 1)
+        matrix = torch.full((num_classes, num_classes), rest)
+        matrix = matrix.fill_diagonal_(diagonal)
+        return matrix
 
 class BackwardNRL(nn.Module):
     def __init__(self, noise_rate, num_classes):
