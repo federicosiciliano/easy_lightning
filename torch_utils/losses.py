@@ -4,6 +4,26 @@ import torch.nn.functional as F
 import math
 import numpy as np
 
+class NoiseRobustCrossEntropyLoss(nn.Module):
+    def __init__(self, noise_rate, num_classes):
+        super(NoiseRobustCrossEntropyLoss, self).__init__()
+        self.noise_rate = noise_rate
+        self.num_classes = num_classes
+
+    def forward(self, input, target):
+        log_probs = F.log_softmax(input, dim=1)
+        num_samples = target.size(0)
+        matrix = self._construct_matrix(self.noise_rate, self.num_classes).to(input.device)
+        loss = -torch.mean(torch.sum(torch.matmul(matrix, log_probs.t()).diag() * target, dim=1))
+        return loss
+
+    def _construct_matrix(self, noise_rate, num_classes):
+        diagonal = 1 - noise_rate
+        rest = noise_rate / (num_classes - 1)
+        matrix = torch.full((num_classes, num_classes), rest)
+        matrix = matrix.fill_diagonal_(diagonal)
+        return matrix
+        
 #https://github.com/dmizr/phuber/blob/master/phuber/loss.py
 class GCELoss(nn.Module):
     """
