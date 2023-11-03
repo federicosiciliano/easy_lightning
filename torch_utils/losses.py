@@ -14,7 +14,8 @@ class NoiseRobustCrossEntropyLoss(nn.Module):
         log_probs = F.log_softmax(input, dim=1)
         num_samples = target.size(0)
         matrix = self._construct_matrix(self.noise_rate, self.num_classes).to(input.device)
-        loss = -torch.mean(torch.sum(torch.matmul(matrix, log_probs.t()).diag() * target, dim=1))
+        matrix_inv = torch.inverse(matrix)
+        loss = -torch.mean(torch.sum(torch.matmul(matrix_inv, log_probs.t()).diag() * target, dim=1))
         return loss
 
     def _construct_matrix(self, noise_rate, num_classes):
