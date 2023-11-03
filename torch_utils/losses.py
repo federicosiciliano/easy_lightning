@@ -18,7 +18,7 @@ class ForwardNRL(nn.Module):
     def __init__(self, noise_rate, num_classes):
         super().__init__()
         # Use log softmax as it has better numerical properties
-        self.log_softmax = nn.LogSoftmax(dim=1)+
+        self.log_softmax = nn.LogSoftmax(dim=1)
         self.noise_rate = noise_rate
         self.num_classes = num_classes
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes).to(input.device)
