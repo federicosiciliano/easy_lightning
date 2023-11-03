@@ -28,7 +28,6 @@ class ForwardNRL(nn.Module):
         
         p = torch.matmul(p, self.matrix.t())
         p = torch.log(p)
-        print(p.size())
         res = p * target
         res = torch.mean(torch.sum(res, dim=1))
               
