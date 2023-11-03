@@ -4,18 +4,52 @@ import torch.nn.functional as F
 import math
 import numpy as np
 
-class NoiseRobustCrossEntropyLoss(nn.Module):
+class ForwardNRL(nn.Module):
+    """Computes the cross-entropy loss
+
+    Shape:
+        - Input: the raw, unnormalized score for each class.
+                tensor of size :math:`(minibatch, C)`, with C the number of classes
+        - Target: the labels, tensor of size :math:`(minibatch)`, where each value
+                is :math:`0 \leq targets[i] \leq C-1`
+        - Output: scalar
+    """
+
     def __init__(self, noise_rate, num_classes):
-        super(NoiseRobustCrossEntropyLoss, self).__init__()
+        super().__init__()
+        # Use log softmax as it has better numerical properties
+        self.log_softmax = nn.LogSoftmax(dim=1)+
         self.noise_rate = noise_rate
         self.num_classes = num_classes
-        matrix = self._construct_matrix(self.noise_rate, self.num_classes).to(input.device)
-        matrix_inv = torch.inverse(matrix)
+        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes).to(input.device)
+
+    def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        
+        p = self.softmax(input)
+        p = torch.matrix(self.matrix, p)
+        p = torch.log(p)
+        
+        p = p[torch.arange(p.shape[0]), target]
+              
+        loss = -p
+
+        return torch.mean(loss)
+
+class BackwardNRL(nn.Module):
+    def __init__(self, noise_rate, num_classes):
+        super(BackwardNRL, self).__init__()
+        self.noise_rate = noise_rate
+        self.num_classes = num_classes
+        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes)
+        self.matrix_inv = torch.inverse(self.matrix)
 
     def forward(self, input, target):
         log_probs = F.log_softmax(input, dim=1)
         num_samples = target.size(0)
-        loss = -torch.mean(torch.sum(torch.matmul(matrix_inv, log_probs.t()).diag() * target, dim=1))
+        a= torch.matmul(self.matrix_inv, log_probs.t())
+        i= a.t() * target
+        m= torch.sum(i, dim=1)
+        loss = -torch.mean(m)
         return loss
 
     def _construct_matrix(self, noise_rate, num_classes):
