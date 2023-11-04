@@ -4,33 +4,20 @@ import torch.nn.functional as F
 import math
 import numpy as np
 
+#https://openaccess.thecvf.com/content_cvpr_2017/papers/Patrini_Making_Deep_Neural_CVPR_2017_paper.pdf
 class ForwardNRL(nn.Module):
-    """Computes the cross-entropy loss
-
-    Shape:
-        - Input: the raw, unnormalized score for each class.
-                tensor of size :math:`(minibatch, C)`, with C the number of classes
-        - Target: the labels, tensor of size :math:`(minibatch)`, where each value
-                is :math:`0 \leq targets[i] \leq C-1`
-        - Output: scalar
-    """
-
     def __init__(self, noise_rate, num_classes):
-        super().__init__()
-        # Use log softmax as it has better numerical properties
+        super(ForwardNRL, self).__init__()
         self.noise_rate = noise_rate
         self.num_classes = num_classes
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes)
 
     def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
-        
         p = F.softmax(input, dim=1)
-        
         p = torch.matmul(p, self.matrix.t())
         p = torch.log(p)
         res = p * target
-        res = torch.mean(torch.sum(res, dim=1))
-              
+        res = torch.mean(torch.sum(res, dim=1))      
         loss = -res
 
         return torch.mean(loss)
@@ -42,6 +29,7 @@ class ForwardNRL(nn.Module):
         matrix = matrix.fill_diagonal_(diagonal)
         return matrix
 
+#https://openaccess.thecvf.com/content_cvpr_2017/papers/Patrini_Making_Deep_Neural_CVPR_2017_paper.pdf
 class BackwardNRL(nn.Module):
     def __init__(self, noise_rate, num_classes):
         super(BackwardNRL, self).__init__()
@@ -53,9 +41,9 @@ class BackwardNRL(nn.Module):
     def forward(self, input, target):
         log_probs = F.log_softmax(input, dim=1)
         num_samples = target.size(0)
-        a= torch.matmul(self.matrix_inv, log_probs.t())
-        i= a.t() * target
-        m= torch.sum(i, dim=1)
+        a = torch.matmul(self.matrix_inv, log_probs.t())
+        i = a.t() * target
+        m = torch.sum(i, dim=1)
         loss = -torch.mean(m)
         return loss
 
