@@ -37,24 +37,23 @@ class BackwardNRL(nn.Module):
         super(BackwardNRL, self).__init__()
         self.noise_rate = noise_rate
         self.num_classes = num_classes
-        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes)
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes).to(self.device)
         self.matrix_inv = torch.inverse(self.matrix)
 
     def forward(self, input, target):
         log_probs = F.log_softmax(input, dim=1)
-        num_samples = target.size(0)
-        a = torch.matmul(self.matrix_inv, log_probs.t())
-        i = a.t() * target
-        m = torch.sum(i, dim=1)
-        loss = -torch.mean(m)
-        return loss
+        a = torch.matmul(self.matrix_inv, log_probs.t()).t()
+        loss = torch.sum(a * target, dim=1)
+        return -torch.mean(loss)
 
     def _construct_matrix(self, noise_rate, num_classes):
         diagonal = 1 - noise_rate
         rest = noise_rate / (num_classes - 1)
         matrix = torch.full((num_classes, num_classes), rest)
-        matrix = matrix.fill_diagonal_(diagonal)
+        matrix.fill_diagonal_(diagonal)
         return matrix
+
         
 #https://github.com/dmizr/phuber/blob/master/phuber/loss.py
 class GCELoss(nn.Module):
