@@ -27,7 +27,7 @@ class ForwardNRL(nn.Module):
         matrix.fill_diagonal_(diagonal)
         return matrix
 
-    def set_noise_rate_and_classes(cfg):
+    def set_noise_rate_and_classes(self, cfg):
         self.noise_rate = cfg["data"]["noise_level"]
         self.num_classes =  cfg["model"]["out_features"]
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
@@ -55,7 +55,7 @@ class BackwardNRL(nn.Module):
         matrix.fill_diagonal_(diagonal)
         return matrix
 
-    def set_noise_rate_and_classes(cfg):
+    def set_noise_rate_and_classes(self, cfg):
         self.noise_rate = cfg["data"]["noise_level"]
         self.num_classes =  cfg["model"]["out_features"]
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
