@@ -9,7 +9,7 @@ class ForwardNRL(nn.Module):
     def __init__(self):
         super(ForwardNRL, self).__init__()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
+        self.matrix = None
         self.noise_rate = None
         self.num_classes =  None
      
@@ -30,13 +30,14 @@ class ForwardNRL(nn.Module):
     def set_noise_rate_and_classes(cfg):
         self.noise_rate = cfg["data"]["noise_level"]
         self.num_classes =  cfg["model"]["out_features"]
+        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
      
 #https://openaccess.thecvf.com/content_cvpr_2017/papers/Patrini_Making_Deep_Neural_CVPR_2017_paper.pdf
 class BackwardNRL(nn.Module):
     def __init__(self):
         super(BackwardNRL, self).__init__()
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
+        self.matrix = None
         self.matrix_inv = torch.inverse(self.matrix)
         self.noise_rate = None
         self.num_classes =  None
@@ -58,7 +59,7 @@ class BackwardNRL(nn.Module):
     def set_noise_rate_and_classes(cfg):
         self.noise_rate = cfg["data"]["noise_level"]
         self.num_classes =  cfg["model"]["out_features"]
-
+        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
         
 #https://github.com/dmizr/phuber/blob/master/phuber/loss.py
 class GCELoss(nn.Module):
