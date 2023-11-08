@@ -8,11 +8,11 @@ import numpy as np
 class ForwardNRL(nn.Module):
     def __init__(self, noise_rate, num_classes):
         super(ForwardNRL, self).__init__()
-        self.noise_rate = noise_rate
-        self.num_classes = num_classes
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
         self.cfg = None
+        self.noise_rate = None
+        self.num_classes =  None
      
     def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         p = F.softmax(input, dim=1)
@@ -28,17 +28,21 @@ class ForwardNRL(nn.Module):
         matrix.fill_diagonal_(diagonal)
         return matrix
 
-
+    def set_attributes():
+        self.noise_rate = cfg["data"]["noise_level"]
+        self.num_classes =  cfg["model"]["out_features"]
+     
 #https://openaccess.thecvf.com/content_cvpr_2017/papers/Patrini_Making_Deep_Neural_CVPR_2017_paper.pdf
 class BackwardNRL(nn.Module):
     def __init__(self, noise_rate, num_classes):
         super(BackwardNRL, self).__init__()
-        self.noise_rate = noise_rate
-        self.num_classes = num_classes
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
         self.matrix_inv = torch.inverse(self.matrix)
         self.cfg = None
+        self.noise_rate = None
+        self.num_classes =  None
+     
 
      def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         log_probs = F.log_softmax(input, dim=1)
@@ -52,6 +56,10 @@ class BackwardNRL(nn.Module):
         matrix = torch.full((num_classes, num_classes), rest, device=device)
         matrix.fill_diagonal_(diagonal)
         return matrix
+
+    def set_attributes():
+        self.noise_rate = cfg["data"]["noise_level"]
+        self.num_classes =  cfg["model"]["out_features"]
 
         
 #https://github.com/dmizr/phuber/blob/master/phuber/loss.py
