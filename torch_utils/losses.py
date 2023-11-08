@@ -11,7 +11,7 @@ class ForwardNRL(nn.Module):
         self.noise_rate = noise_rate
         self.num_classes = num_classes
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device)
+        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
      
 
     def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
