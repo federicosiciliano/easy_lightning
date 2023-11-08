@@ -17,8 +17,8 @@ class ForwardNRL(nn.Module):
         p = F.softmax(input, dim=1)
         p = torch.matmul(p, self.matrix.t())
         p = torch.log(p) 
-        loss = torch.sum(p * target, dim=1)
-        return -torch.mean(loss)
+        loss = -torch.sum(p * target, dim=1)
+        return torch.mean(loss)
     
     def _construct_matrix(self, noise_rate, num_classes, device):
         diagonal = 1 - noise_rate
@@ -45,8 +45,8 @@ class BackwardNRL(nn.Module):
     def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         log_probs = F.log_softmax(input, dim=1)
         a = torch.matmul(self.matrix_inv, log_probs.t()).t()
-        loss = torch.sum(a * target, dim=1)
-        return -torch.mean(loss)
+        loss = -torch.sum(a * target, dim=1)
+        return torch.mean(loss)
 
     def _construct_matrix(self, noise_rate, num_classes, device):
         diagonal = 1 - noise_rate
