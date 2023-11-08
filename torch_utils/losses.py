@@ -12,16 +12,14 @@ class ForwardNRL(nn.Module):
         self.num_classes = num_classes
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
+        self.cfg = None
      
-
     def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         p = F.softmax(input, dim=1)
         p = torch.matmul(p, self.matrix.t())
-        p = torch.log(p)
-        res = p * target    
-        loss = -torch.sum(res, dim=1)
-
-        return torch.mean(loss)
+        p = torch.log(p) 
+        loss = torch.sum(p * target, dim=1)
+        return -torch.mean(loss)
     
     def _construct_matrix(self, noise_rate, num_classes, device):
         diagonal = 1 - noise_rate
@@ -40,8 +38,9 @@ class BackwardNRL(nn.Module):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
         self.matrix_inv = torch.inverse(self.matrix)
+        self.cfg = None
 
-    def forward(self, input, target):
+     def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         log_probs = F.log_softmax(input, dim=1)
         a = torch.matmul(self.matrix_inv, log_probs.t()).t()
         loss = torch.sum(a * target, dim=1)
