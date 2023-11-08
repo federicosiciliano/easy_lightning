@@ -31,7 +31,7 @@ class ForwardNRL(nn.Module):
         self.noise_rate = cfg["data"]["noise_level"]
         self.num_classes =  cfg["model"]["out_features"]
 
-    def create_noise_matrix():
+    def create_noise_matrix(self):
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
      
 #https://openaccess.thecvf.com/content_cvpr_2017/papers/Patrini_Making_Deep_Neural_CVPR_2017_paper.pdf
@@ -62,7 +62,7 @@ class BackwardNRL(nn.Module):
         self.noise_rate = cfg["data"]["noise_level"]
         self.num_classes =  cfg["model"]["out_features"]
 
-    def create_noise_matrix():
+    def create_noise_matrix(self):
         self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
         self.matrix_inv = torch.inverse(self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device))
         
