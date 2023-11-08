@@ -42,7 +42,7 @@ class BackwardNRL(nn.Module):
         self.num_classes =  None
      
 
-     def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         log_probs = F.log_softmax(input, dim=1)
         a = torch.matmul(self.matrix_inv, log_probs.t()).t()
         loss = torch.sum(a * target, dim=1)
