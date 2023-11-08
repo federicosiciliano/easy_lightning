@@ -38,7 +38,7 @@ class BackwardNRL(nn.Module):
         self.noise_rate = noise_rate
         self.num_classes = num_classes
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes).to(self.device)
+        self.matrix = self._construct_matrix(self.noise_rate, self.num_classes, self.device).to(self.device)
         self.matrix_inv = torch.inverse(self.matrix)
 
     def forward(self, input, target):
@@ -47,10 +47,10 @@ class BackwardNRL(nn.Module):
         loss = torch.sum(a * target, dim=1)
         return -torch.mean(loss)
 
-    def _construct_matrix(self, noise_rate, num_classes):
+    def _construct_matrix(self, noise_rate, num_classes, device):
         diagonal = 1 - noise_rate
         rest = noise_rate / (num_classes - 1)
-        matrix = torch.full((num_classes, num_classes), rest)
+        matrix = torch.full((num_classes, num_classes), rest, device=device)
         matrix.fill_diagonal_(diagonal)
         return matrix
 
