@@ -2,6 +2,8 @@
 import torch
 import pytorch_lightning as pl
 from .losses import NCODLoss
+#NCODLoss has manual optmization as written here https://lightning.ai/docs/pytorch/stable/model/manual_optimization.html# according
+#to the paper https://github.com/RSTLess-research/NCOD-Learning-with-noisy-labels/tree/main
 
 # Define the BaseNN class
 class BaseNN(pl.LightningModule):
