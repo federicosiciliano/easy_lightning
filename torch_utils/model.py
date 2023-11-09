@@ -16,6 +16,9 @@ class BaseNN(pl.LightningModule):
 
         # Store the primary loss function
         self.loss = loss
+        
+        # Check if the loss is an instance of NCODLoss and set automatic_optimization accordingly to False if True
+        self.automatic_optimization = not isinstance(self.loss, NCODLoss)
 
         # Define the metrics to be used for evaluation
         self.metrics = metrics
@@ -55,7 +58,7 @@ class BaseNN(pl.LightningModule):
 
     # Configure the optimizer for training
     def configure_optimizers(self):
-        if isinstance(loss, NCODLoss):
+        if isinstance(self.loss, NCODLoss):
             optimizer1 = self.optimizer(self.main_module.parameters())
             optimizer2 = self.optimizer(self.loss.parameters())
             return optimizer1, optimizer2
@@ -65,7 +68,7 @@ class BaseNN(pl.LightningModule):
         
 
     # Define a step function for processing a batch
-    def step(self, batch, batch_idx, split):
+    def step(self, batch, batch_idx, split, optimizer_idx=None):
         x, y = batch
 
         y_hat = self(x)
@@ -79,10 +82,23 @@ class BaseNN(pl.LightningModule):
             metric_value = metric_func(y_hat, y)
             self.custom_log(split+'_'+metric_name, metric_value)
 
+        if split == "train" and optimizer_idx is not None:
+            # Get the correct optimizer
+            optimizer = self.optimizers()[optimizer_idx]
+    
+            # Zero gradients of the optimizer
+            optimizer.zero_grad()
+            
+            # Perform the backward pass to calculate gradients
+            self.manual_backward(loss)
+            
+            # Update parameters of the optimizer
+            optimizer.step()
+
         return loss
 
     # Training step
-    def training_step(self, batch, batch_idx): return self.step(batch, batch_idx, "train")
+    def training_step(self, batch, batch_idx, optimizer_idx=None): return self.step(batch, batch_idx, "train", optimizer_idx)
 
     # Validation step
     def validation_step(self, batch, batch_idx, dataloader_idx=0): return self.step(batch, batch_idx, "val")
