@@ -1,6 +1,7 @@
 # Import necessary libraries
 import torch
 import pytorch_lightning as pl
+from losses import NCODLoss
 
 # Define the BaseNN class
 class BaseNN(pl.LightningModule):
@@ -54,8 +55,14 @@ class BaseNN(pl.LightningModule):
 
     # Configure the optimizer for training
     def configure_optimizers(self):
-        optimizer = self.optimizer(self.parameters())
-        return optimizer
+        if isinstance(loss, NCODLoss):
+            optimizer1 = self.optimizer(self.main_module.parameters())
+            optimizer2 = self.optimizer(self.loss.parameters())
+            return optimizer1, optimizer
+            
+        optimizer1 = self.optimizer(self.parameters())   
+        return optimizer1
+        
 
     # Define a step function for processing a batch
     def step(self, batch, batch_idx, split):
