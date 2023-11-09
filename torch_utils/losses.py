@@ -122,13 +122,13 @@ class GCELoss(nn.Module):
         return torch.mean(loss)
 
 
-cross_entropy_val = nn.CrossEntropyLoss
-
-mean = 1e-8
-std = 1e-9
-encoder_features = 512
-
 class NCODLoss(nn.Module):
+    
+    cross_entropy_val = nn.CrossEntropyLoss
+    mean = 1e-8
+    std = 1e-9
+    encoder_features = 512
+    
     def __init__(self, sample_labels, num_examp=50000, num_classes=100, ratio_consistency=0, ratio_balance=0, total_epochs=4000):
         super(NCODLoss, self).__init__()
 
