@@ -58,7 +58,7 @@ class BaseNN(pl.LightningModule):
         if isinstance(loss, NCODLoss):
             optimizer1 = self.optimizer(self.main_module.parameters())
             optimizer2 = self.optimizer(self.loss.parameters())
-            return optimizer1, optimizer
+            return optimizer1, optimizer2
             
         optimizer1 = self.optimizer(self.parameters())   
         return optimizer1
