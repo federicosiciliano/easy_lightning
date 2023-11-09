@@ -1,7 +1,7 @@
 # Import necessary libraries
 import torch
 import pytorch_lightning as pl
-from losses import NCODLoss
+from ../losses import NCODLoss
 
 # Define the BaseNN class
 class BaseNN(pl.LightningModule):
