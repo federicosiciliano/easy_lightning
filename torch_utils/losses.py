@@ -132,7 +132,8 @@ class NCODLoss(nn.Module):
         self.num_examp = num_examp
         self.encoder_features = encoder_features
         self.total_epochs = total_epochs
-        
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
         self.ratio_consistency = ratio_consistency
         self.ratio_balance = ratio_balance
 
@@ -140,8 +141,8 @@ class NCODLoss(nn.Module):
         self.init_param(mean=self.mean, std=self.std)
 
         self.beginning = True
-        self.prevSimilarity = torch.rand((num_examp, encoder_features))
-        self.masterVector = torch.rand((num_classes, encoder_features))
+        self.prevSimilarity = torch.rand((num_examp, encoder_features)).to(device)
+        self.masterVector = torch.rand((num_classes, encoder_features)).to(device)
         self.sample_labels = sample_labels
         self.bins = []
 
@@ -158,7 +159,8 @@ class NCODLoss(nn.Module):
         else:
             output = outputs
             out1 = out
-
+            
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         eps = 1e-4
 
         u = self.u[index]
@@ -169,7 +171,7 @@ class NCODLoss(nn.Module):
                 for i in range(0, len(self.bins)):
                     class_u = self.u.detach()[self.bins[i]]
                     bottomK = int((len(class_u) / 100) * percent)
-                    important_indexs = torch.topk(class_u, bottomK, largest=False, dim=0)[1]
+                    important_indexs = torch.topk(class_u, bottomK, largest=False, dim=0)[1].to(device)
                     self.masterVector[i] = torch.mean(
                         self.prevSimilarity[self.bins[i]][important_indexs.view(-1)], dim=0
                     )
