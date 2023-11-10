@@ -121,15 +121,12 @@ class GCELoss(nn.Module):
         # Return the mean loss
         return torch.mean(loss)
 
-
 class NCODLoss(nn.Module):
-    cross_entropy_val = nn.CrossEntropyLoss
-    mean = 1e-8
-    std = 1e-9
     
     def __init__(self, sample_labels=None, num_examp=50000, num_classes=100, ratio_consistency=0, ratio_balance=0, total_epochs=4000, encoder_features=512):
         super(NCODLoss, self).__init__()
-
+        self.mean = 1e-8
+        self.std = 1e-9
         self.num_classes = num_classes
         self.USE_CUDA = torch.cuda.is_available()
         self.num_examp = num_examp
@@ -139,7 +136,7 @@ class NCODLoss(nn.Module):
         self.ratio_balance = ratio_balance
 
         self.u = nn.Parameter(torch.empty(num_examp, 1, dtype=torch.float32))
-        self.init_param(mean=mean, std=std)
+        self.init_param(mean=self.mean, std=self.std)
 
         self.beginning = True
         self.prevSimilarity = torch.rand((num_examp, encoder_features))
@@ -151,7 +148,7 @@ class NCODLoss(nn.Module):
             self.bins.append(np.where(self.sample_labels == i)[0])
 
     def init_param(self, mean=1e-8, std=1e-9):
-        torch.nn.init.normal_(self.u, mean=mean, std=std)
+        torch.nn.init.normal_(self.u, mean=self.mean, std=self.std)
 
     def forward(self, index, outputs, label, out, flag, epoch):
         if len(outputs) > len(index):
