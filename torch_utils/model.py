@@ -78,7 +78,7 @@ class BaseNN(pl.LightningModule):
             loss = self.loss(index, output, y, out, batch_idx, self.current_epoch)
             
         else:
-            y_hat = self(x)
+            y_hat,out = self(x)
             loss = self.loss(y_hat, y)
 
         self.custom_log(split+'_loss', loss)
