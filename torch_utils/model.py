@@ -71,11 +71,15 @@ class BaseNN(pl.LightningModule):
 
     # Define a step function for processing a batch
     def step(self, batch, batch_idx, split, optimizer_idx=None):
-        x, y = batch
-
-        y_hat = self(x)
-
-        loss = self.loss(y_hat, y)
+        x, y, index = batch
+        
+        if isinstance(self.loss, NCODLoss):
+            output,out = self(x)
+            loss = self.loss(index, output, y, out, batch_idx, self.current_epoch)
+            
+        else:
+            y_hat = self(x)
+            loss = self.loss(y_hat, y)
 
         self.custom_log(split+'_loss', loss)
 
