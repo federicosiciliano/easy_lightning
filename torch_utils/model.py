@@ -72,14 +72,12 @@ class BaseNN(pl.LightningModule):
     # Define a step function for processing a batch
     def step(self, batch, batch_idx, split, optimizer_idx=None):
         x, y, index = batch
-        print(x)
-        print(y)
-        print(index)
         
         #https://github.com/RSTLess-research/NCOD-Learning-with-noisy-labels/tree/main
         if isinstance(self.loss, NCODLoss):
             y_hat,out = self(x)
-            print(y_hat,out)
+            print("SIZE OUTPUT",y_hat.size())
+            print("SIZE ENCODER FEATURES", out.size())
             loss = self.loss(index, y_hat, y, out, batch_idx, self.current_epoch)
             
         else:
