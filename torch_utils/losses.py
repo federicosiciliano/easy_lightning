@@ -141,8 +141,8 @@ class NCODLoss(nn.Module):
         self.init_param(mean=self.mean, std=self.std)
 
         self.beginning = True
-        self.prevSimilarity = torch.rand((num_examp, encoder_features)).to(device)
-        self.masterVector = torch.rand((num_classes, encoder_features)).to(device)
+        self.prevSimilarity = torch.rand((num_examp, encoder_features)).to(self.device)
+        self.masterVector = torch.rand((num_classes, encoder_features)).to(self.device)
         self.sample_labels = sample_labels
         self.bins = []
 
