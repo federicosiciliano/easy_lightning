@@ -83,8 +83,8 @@ class BaseNN(pl.LightningModule):
         #https://github.com/RSTLess-research/NCOD-Learning-with-noisy-labels/tree/main
         if isinstance(self.loss, NCODLoss):
             y_hat,out = self(x)
-            print("SIZE OUTPUT",y_hat.size())
-            print("SIZE ENCODER FEATURES", out.size())
+            #print("SIZE OUTPUT",y_hat.size())
+            #print("SIZE ENCODER FEATURES", out.size())
             loss = self.loss(index, y_hat, y, out, batch_idx, self.current_epoch)
             
         else:
