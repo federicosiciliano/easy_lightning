@@ -127,7 +127,7 @@ class NCODLoss(nn.Module):
     mean = 1e-8
     std = 1e-9
     
-    def __init__(self, sample_labels, num_examp=50000, num_classes=100, ratio_consistency=0, ratio_balance=0, total_epochs=4000, encoder_features):
+    def __init__(self, sample_labels=None, num_examp=50000, num_classes=100, ratio_consistency=0, ratio_balance=0, total_epochs=4000, encoder_features=512):
         super(NCODLoss, self).__init__()
 
         self.num_classes = num_classes
