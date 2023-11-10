@@ -31,20 +31,15 @@ def prepare_data_loaders(data, loader_params, split_keys={"train": ["train_x", "
                 if split_name in value.keys():
                     split_loader_params[key] = value[split_name]
         
-        # Get data
-        split_data = []
-        for data_key in data_keys:
-            split_data.append(torch.Tensor(data[data_key]))
+        # Get data and create the TensorDataset
+        features = torch.tensor(data[data_keys[0]], dtype=torch.float32)
+        targets = torch.tensor(data[data_keys[1]], dtype=torch.long)
+        # Create an indices tensor
+        indices = torch.arange(start=0, end=len(features), dtype=torch.long)
+        td = TensorDataset(features, targets, indices)
 
-        # Convert batch_size to int if it's a float
-        # if isinstance(split_loader_params["batch_size"], float):
-        #   split_loader_params["batch_size"] = int(len(data[split_keys[split_name][0]]) * split_loader_params["batch_size"])
-
-        # Create a TensorDataset
-        td = torch.utils.data.TensorDataset(*split_data)
-        # Would need LongTensor if data[split_y] is not one-hot encoded
-
-        loaders[split_name] = torch.utils.data.DataLoader(td, **split_loader_params)
+        # Create the DataLoader
+        loaders[split_name] = DataLoader(td, **split_loader_params)
     return loaders
 
 
