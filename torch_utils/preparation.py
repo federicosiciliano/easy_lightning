@@ -4,7 +4,7 @@ import torch
 import pytorch_lightning as pl
 import torchmetrics
 from copy import deepcopy
-from torch.utils.data import TensorDataset
+from torch.utils.data import DataLoader, TensorDataset
 # Import modules and functions from local files
 from .model import BaseNN
 from . import metrics as custom_metrics
