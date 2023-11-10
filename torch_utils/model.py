@@ -76,10 +76,16 @@ class BaseNN(pl.LightningModule):
             
         optimizer1 = self.optimizer(self.parameters())   
         return optimizer1
+
+   def on_epoch_end(self):
+        # Step through each scheduler
+        for scheduler in self.lr_schedulers():
+            scheduler.step()
+
         
 
     # Define a step function for processing a batch
-    def step(self, batch, batch_idx, split, optimizer_idx=None):
+    def step(self, batch, batch_idx, split, optimizer_idx):
         x, y, index = batch
         
         #https://github.com/RSTLess-research/NCOD-Learning-with-noisy-labels/tree/main
@@ -94,7 +100,9 @@ class BaseNN(pl.LightningModule):
             loss = self.loss(y_hat, y)
 
         self.custom_log(split+'_loss', loss)
-
+        
+        print("OPTIMIZER_IDX", optimizer_idx)
+        
         # Compute other metrics
         for metric_name, metric_func in self.metrics.items():
             metric_value = metric_func(y_hat, y)
