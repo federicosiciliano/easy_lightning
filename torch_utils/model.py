@@ -22,6 +22,7 @@ class BaseNN(pl.LightningModule):
         
         # Check if the loss is an instance of NCODLoss and set automatic_optimization accordingly to False if True
         self.automatic_optimization = not isinstance(self.loss, NCODLoss)
+        print("USING AUTOMATIC OPTIMIZATIONNNNN..")
 
         # Define the metrics to be used for evaluation
         self.metrics = metrics
@@ -70,6 +71,7 @@ class BaseNN(pl.LightningModule):
                 'interval': 'epoch',
                 'frequency': 1
             }
+            print("USING OPTIMIZERS FOR NCOD_LOSSS...")
             return [optimizer1, optimizer2], [scheduler1]
             
         optimizer1 = self.optimizer(self.parameters())   
