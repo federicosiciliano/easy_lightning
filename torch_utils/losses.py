@@ -123,19 +123,18 @@ class GCELoss(nn.Module):
 
 
 class NCODLoss(nn.Module):
-    
     cross_entropy_val = nn.CrossEntropyLoss
     mean = 1e-8
     std = 1e-9
-    encoder_features = 512
     
-    def __init__(self, sample_labels, num_examp=50000, num_classes=100, ratio_consistency=0, ratio_balance=0, total_epochs=4000):
+    def __init__(self, sample_labels, num_examp=50000, num_classes=100, ratio_consistency=0, ratio_balance=0, total_epochs=4000, encoder_features):
         super(NCODLoss, self).__init__()
 
         self.num_classes = num_classes
         self.USE_CUDA = torch.cuda.is_available()
         self.num_examp = num_examp
-
+        self.encoder_features = encoder_features
+        
         self.ratio_consistency = ratio_consistency
         self.ratio_balance = ratio_balance
 
