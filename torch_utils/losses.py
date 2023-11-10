@@ -131,6 +131,7 @@ class NCODLoss(nn.Module):
         self.USE_CUDA = torch.cuda.is_available()
         self.num_examp = num_examp
         self.encoder_features = encoder_features
+        self.total_epochs = total_epochs
         
         self.ratio_consistency = ratio_consistency
         self.ratio_balance = ratio_balance
@@ -164,7 +165,7 @@ class NCODLoss(nn.Module):
 
         if flag == 0:
             if self.beginning:
-                percent = math.ceil((50 - (50 / total_epochs) * epoch) + 50)
+                percent = math.ceil((50 - (50 / self.total_epochs) * epoch) + 50)
                 for i in range(0, len(self.bins)):
                     class_u = self.u.detach()[self.bins[i]]
                     bottomK = int((len(class_u) / 100) * percent)
