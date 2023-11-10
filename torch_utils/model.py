@@ -73,9 +73,10 @@ class BaseNN(pl.LightningModule):
     def step(self, batch, batch_idx, split, optimizer_idx=None):
         x, y, index = batch
         
+        #https://github.com/RSTLess-research/NCOD-Learning-with-noisy-labels/tree/main
         if isinstance(self.loss, NCODLoss):
-            output,out = self(x)
-            loss = self.loss(index, output, y, out, batch_idx, self.current_epoch)
+            y_hat,out = self(x)
+            loss = self.loss(index, y_hat, y, out, batch_idx, self.current_epoch)
             
         else:
             y_hat,out = self(x)
