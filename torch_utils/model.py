@@ -63,7 +63,7 @@ class BaseNN(pl.LightningModule):
     def configure_optimizers(self):
         if isinstance(self.loss, NCODLoss):
             optimizer1 = self.optimizer(self.main_module.parameters())
-            optimizer2 = optim.Adam(self.less.parameters(), lr=0.1)
+            optimizer2 = optim.Adam(self.loss.parameters(), lr=0.1)
             # Define learning rate schedulers
             scheduler1 = {
                 'scheduler': optim.lr_scheduler.MultiStepLR(optimizer1, milestones=[80, 120], gamma=0.1),
