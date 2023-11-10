@@ -22,7 +22,7 @@ class BaseNN(pl.LightningModule):
         
         # Check if the loss is an instance of NCODLoss and set automatic_optimization accordingly to False if True
         self.automatic_optimization = not isinstance(self.loss, NCODLoss)
-        print("USING AUTOMATIC OPTIMIZATIONNNNN..")
+        print("USING AUTOMATIC OPTIMIZATIONNNNN..",self.automatic_optimization)
 
         # Define the metrics to be used for evaluation
         self.metrics = metrics
@@ -101,6 +101,7 @@ class BaseNN(pl.LightningModule):
             self.custom_log(split+'_'+metric_name, metric_value)
 
         if split == "train" and optimizer_idx is not None:
+            print("OPTIMIZING AND STEP FOR NCOD_LOSSS...")
             # Get the correct optimizer
             optimizer = self.optimizers()[optimizer_idx]
     
