@@ -79,6 +79,7 @@ class BaseNN(pl.LightningModule):
 
     def on_epoch_end(self):
         # Step through each scheduler
+        print("UPDATING THE LR....")
         for scheduler in self.lr_schedulers():
             scheduler.step()
 
@@ -112,7 +113,7 @@ class BaseNN(pl.LightningModule):
             
             # Loop over all optimizers
             for optimizer_idx, optimizer in enumerate(self.optimizers()):
-                
+                print("MANUAL OPTIMIZATION OF NCODLOSS: STEP AND ZERO GRAD FOR OPTIMIZER: ", optimizer_idx)
                 # Zero gradients of the current optimizer
                 optimizer.zero_grad()
         
