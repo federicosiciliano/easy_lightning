@@ -108,11 +108,12 @@ class BaseNN(pl.LightningModule):
             self.custom_log(split+'_'+metric_name, metric_value)
 
         if split == "train" and isinstance(self.loss, NCODLoss):
+            # Perform the backward pass to calculate gradients
+            self.manual_backward(loss)
+            
             # Loop over all optimizers
             for optimizer_idx, optimizer in enumerate(self.optimizers()):
                 #print("MANUAL OPTIMIZATION OF NCODLOSS: STEP AND ZERO GRAD FOR OPTIMIZER: ", optimizer_idx)
-                # Perform the backward pass to calculate gradients
-                self.manual_backward(loss)
                 
                 # Update parameters of the current optimizer
                 optimizer.step()
