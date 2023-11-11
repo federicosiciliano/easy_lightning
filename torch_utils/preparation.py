@@ -33,7 +33,7 @@ def prepare_data_loaders(data, loader_params, split_keys={"train": ["train_x", "
         
         # Get data and create the TensorDataset
         features = torch.tensor(data[data_keys[0]], dtype=torch.float32)
-        targets = torch.tensor(data[data_keys[1]], dtype=torch.long)
+        targets = torch.tensor(data[data_keys[1]], dtype=torch.float32)
         # Create an indices tensor
         indices = torch.arange(start=0, end=len(features), dtype=torch.long)
         td = TensorDataset(features, targets, indices)
