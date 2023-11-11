@@ -21,8 +21,8 @@ class BaseNN(pl.LightningModule):
         self.loss = loss
         
         # Check if the loss is an instance of NCODLoss and set automatic_optimization accordingly to False if True
-        self.automatic_optimization = not isinstance(self.loss, NCODLoss)
-        print("USING AUTOMATIC OPTIMIZATIONNNNN..",self.automatic_optimization)
+        #automatic_optimization = not isinstance(self.loss, NCODLoss)
+        #print("USING AUTOMATIC OPTIMIZATIONNNNN..",self.automatic_optimization)
 
         # Define the metrics to be used for evaluation
         self.metrics = metrics
