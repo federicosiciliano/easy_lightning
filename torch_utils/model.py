@@ -111,14 +111,14 @@ class BaseNN(pl.LightningModule):
             # Loop over all optimizers
             for optimizer_idx, optimizer in enumerate(self.optimizers()):
                 #print("MANUAL OPTIMIZATION OF NCODLOSS: STEP AND ZERO GRAD FOR OPTIMIZER: ", optimizer_idx)
-                # Zero gradients of the current optimizer
-                optimizer.zero_grad()
-                
                 # Perform the backward pass to calculate gradients
                 self.manual_backward(loss)
                 
                 # Update parameters of the current optimizer
                 optimizer.step()
+
+                # Zero gradients of the current optimizer
+                optimizer.zero_grad()
 
             return loss
 
