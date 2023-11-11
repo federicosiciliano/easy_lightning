@@ -121,7 +121,7 @@ class BaseNN(pl.LightningModule):
                 # Zero gradients of the current optimizer
                 optimizer.zero_grad()
 
-            return loss
+        return loss
 
     # Training step
     def training_step(self, batch, batch_idx): return self.step(batch, batch_idx, "train")
