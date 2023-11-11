@@ -77,7 +77,7 @@ class BaseNN(pl.LightningModule):
         optimizer1 = self.optimizer(self.parameters())   
         return optimizer1
 
-   def on_epoch_end(self):
+    def on_epoch_end(self):
         # Step through each scheduler
         for scheduler in self.lr_schedulers():
             scheduler.step()
@@ -85,7 +85,7 @@ class BaseNN(pl.LightningModule):
         
 
     # Define a step function for processing a batch
-    def step(self, batch, batch_idx, split, optimizer_idx):
+    def step(self, batch, batch_idx, split):
         x, y, index = batch
         
         #https://github.com/RSTLess-research/NCOD-Learning-with-noisy-labels/tree/main
@@ -101,31 +101,28 @@ class BaseNN(pl.LightningModule):
 
         self.custom_log(split+'_loss', loss)
         
-        print("OPTIMIZER_IDX", optimizer_idx)
-        
         # Compute other metrics
         for metric_name, metric_func in self.metrics.items():
             metric_value = metric_func(y_hat, y)
             self.custom_log(split+'_'+metric_name, metric_value)
 
-        if split == "train" and optimizer_idx is not None:
-            print("OPTIMIZING AND STEP FOR NCOD_LOSSS...")
-            # Get the correct optimizer
-            optimizer = self.optimizers()[optimizer_idx]
-    
-            # Zero gradients of the optimizer
-            optimizer.zero_grad()
-            
+        if split == "train" and isinstance(self.loss, NCODLoss):
             # Perform the backward pass to calculate gradients
             self.manual_backward(loss)
             
-            # Update parameters of the optimizer
-            optimizer.step()
+            # Loop over all optimizers
+            for optimizer_idx, optimizer in enumerate(self.optimizers()):
+                
+                # Zero gradients of the current optimizer
+                optimizer.zero_grad()
+        
+                # Update parameters of the current optimizer
+                optimizer.step()
 
-        return loss
+            return loss
 
     # Training step
-    def training_step(self, batch, batch_idx, optimizer_idx=None): return self.step(batch, batch_idx, "train", optimizer_idx)
+    def training_step(self, batch, batch_idx): return self.step(batch, batch_idx, "train")
 
     # Validation step
     def validation_step(self, batch, batch_idx, dataloader_idx=0): return self.step(batch, batch_idx, "val")
