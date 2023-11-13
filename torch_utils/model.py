@@ -77,11 +77,11 @@ class BaseNN(pl.LightningModule):
         optimizer1 = self.optimizer(self.parameters())   
         return optimizer1
 
-    def on_epoch_end(self):
+    #def on_epoch_end(self):
         # Step through each scheduler
-        print("UPDATING THE LR....")
-        for scheduler in self.lr_schedulers():
-            scheduler.step()
+        #print("UPDATING THE LR....")
+        #for scheduler in self.lr_schedulers():
+            #scheduler.step()
 
         
 
