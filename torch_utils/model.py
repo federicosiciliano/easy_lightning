@@ -119,17 +119,19 @@ class BaseNN(pl.LightningModule):
                 # Zero gradients of the current optimizer
                 optimizer.zero_grad()
 
-                if self.trainer.is_last_batch and (self.trainer.current_epoch + 1) % 10 == 0:
+                if optimizer_idx == 0 and self.trainer.is_last_batch and (self.trainer.current_epoch + 1) % 1 == 0:
                     current_lr = optimizer.param_groups[0]['lr']
                     print(current_lr)
                 
             schedulers = self.lr_schedulers()
             if isinstance(schedulers, list):  # Check if it's a list of schedulers
-                if (self.trainer.current_epoch == 80 and self.trainer.is_last_batch) or (self.trainer.current_epoch == 120 and self.trainer.is_last_batch):
+                if (self.trainer.current_epoch == 0 and self.trainer.is_last_batch) or (self.trainer.current_epoch == 120 and self.trainer.is_last_batch):
                     for scheduler in schedulers:
+                        print("SCHEDULERS")
                         scheduler.step()
             else:  # If it's a single scheduler object
                 if (self.trainer.current_epoch == 80 and self.trainer.is_last_batch) or (self.trainer.current_epoch == 120 and self.trainer.is_last_batch):
+                    print("SINGLE SCHEDULER")
                     schedulers.step()
                     
         return loss
