@@ -119,8 +119,9 @@ class BaseNN(pl.LightningModule):
                 # Zero gradients of the current optimizer
                 optimizer.zero_grad()
 
-                current_lr = optimizer.param_groups[0]['lr']
-                print(current_lr)
+                if self.trainer.is_last_batch and (self.trainer.current_epoch + 1) % 10 == 0:
+                    current_lr = optimizer.param_groups[0]['lr']
+                    print(current_lr)
                 
             schedulers = self.lr_schedulers()
             if isinstance(schedulers, list):  # Check if it's a list of schedulers
