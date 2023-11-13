@@ -120,6 +120,9 @@ class BaseNN(pl.LightningModule):
 
                 # Zero gradients of the current optimizer
                 optimizer.zero_grad()
+
+                current_lr = optimizer.param_groups[0]['lr']
+                print(current_lr)
                 
             schedulers = self.lr_schedulers()
             if isinstance(schedulers, list):  # Check if it's a list of schedulers
@@ -127,8 +130,7 @@ class BaseNN(pl.LightningModule):
                     scheduler.step()
             else:  # If it's a single scheduler object
                 schedulers.step()
-                        
-
+                    
         return loss
 
     # Training step
