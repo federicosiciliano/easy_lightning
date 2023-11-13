@@ -125,8 +125,9 @@ class BaseNN(pl.LightningModule):
                 
             schedulers = self.lr_schedulers()
             if isinstance(schedulers, list):  # Check if it's a list of schedulers
-                for scheduler in schedulers:
-                    scheduler.step()
+                if (self.trainer.current_epoch == 80 and self.trainer.is_last_batch) or (self.trainer.current_epoch == 120 and self.trainer.is_last_batch):
+                    for scheduler in schedulers:
+                        scheduler.step()
             else:  # If it's a single scheduler object
                 if (self.trainer.current_epoch == 80 and self.trainer.is_last_batch) or (self.trainer.current_epoch == 120 and self.trainer.is_last_batch):
                     schedulers.step()
