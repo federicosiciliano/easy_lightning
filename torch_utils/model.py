@@ -120,6 +120,9 @@ class BaseNN(pl.LightningModule):
 
                 # Zero gradients of the current optimizer
                 optimizer.zero_grad()
+                
+            for scheduler in self.lr_schedulers():
+                scheduler.step()
 
         return loss
 
