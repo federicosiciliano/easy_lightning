@@ -122,7 +122,6 @@ class GCELoss(nn.Module):
         return torch.mean(loss)
 
 class NCODLoss(nn.Module):
-    
     def __init__(self, sample_labels=None, num_examp=50000, num_classes=100, ratio_consistency=0, ratio_balance=0, total_epochs=4000, encoder_features=512):
         super(NCODLoss, self).__init__()
         self.mean = 1e-8
