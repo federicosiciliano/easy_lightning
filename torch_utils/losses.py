@@ -48,7 +48,7 @@ class BackwardNRL(nn.Module):
         log_probs = F.log_softmax(input, dim=1)
         adjusted_probs = torch.matmul(self.matrix_inv, log_probs.t()).t()
         loss = torch.sum(-1 * adjusted_probs * target, dim=1)
-        return torch.mean(loss)
+        return torch.abs(torch.mean(loss))
 
 
     def _construct_matrix(self, noise_rate, num_classes, device):
