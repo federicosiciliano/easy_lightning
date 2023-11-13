@@ -81,9 +81,7 @@ class BaseNN(pl.LightningModule):
         # Step through each scheduler
         #print("UPDATING THE LR....")
         #for scheduler in self.lr_schedulers():
-            #scheduler.step()
-
-        
+            #scheduler.step()     
 
     # Define a step function for processing a batch
     def step(self, batch, batch_idx, split):
@@ -121,8 +119,9 @@ class BaseNN(pl.LightningModule):
                 # Zero gradients of the current optimizer
                 optimizer.zero_grad()
 
-                current_lr = optimizer.param_groups[0]['lr']
-                print(current_lr)
+                if (self.current_epoch == 80 and self.current_epoch == 120):
+                    current_lr = optimizer.param_groups[0]['lr']
+                    print(current_lr)
                 
             schedulers = self.lr_schedulers()
             if isinstance(schedulers, list):  # Check if it's a list of schedulers
