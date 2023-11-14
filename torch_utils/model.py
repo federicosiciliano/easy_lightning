@@ -3,6 +3,10 @@ import torch
 import pytorch_lightning as pl
 from .losses import NCODLoss
 import torch.optim as optim
+import torch.nn as nn
+
+# You can use this loss object in your code
+
 #NCODLoss has manual optmization as written here https://lightning.ai/docs/pytorch/stable/model/manual_optimization.html# according
 #to the paper https://github.com/RSTLess-research/NCOD-Learning-with-noisy-labels/tree/main
 
@@ -26,6 +30,8 @@ class BaseNN(pl.LightningModule):
 
         # Define the metrics to be used for evaluation
         self.metrics = metrics
+        
+        #self.cross_entropy_loss = nn.CrossEntropyLoss()
 
         # Prototype for customizing logging for multiple losses (if needed)
         # self.losses = loss
@@ -83,6 +89,20 @@ class BaseNN(pl.LightningModule):
         #for scheduler in self.lr_schedulers():
             #scheduler.step()     
 
+    def test_step(self, batch, batch_idx, split):
+        #x, y, index = batch
+        #y_hat,out = self(x)
+        #loss = self.cross_entropy_loss(y_hat, y)
+        
+        #self.custom_log(split+'_loss', loss)
+        
+        # Compute other metrics
+        #for metric_name, metric_func in self.metrics.items():
+            #metric_value = metric_func(y_hat, y)
+            #self.custom_log(split+'_'+metric_name, metric_value)
+        
+        #return loss
+        
     # Define a step function for processing a batch
     def step(self, batch, batch_idx, split):
         x, y, index = batch
