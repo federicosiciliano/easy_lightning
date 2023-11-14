@@ -12,11 +12,12 @@ class ForwardNRL(nn.Module):
         self.matrix = None
         self.noise_rate = None
         self.num_classes =  None
+        self.epsilon = 1e-10  # Small constant to prevent NaN
      
     def forward(self, input: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         p = F.softmax(input, dim=1)
         p = torch.matmul(p, self.matrix.t())
-        p = torch.log(p) 
+        p = torch.log(p + self.epsilon)
         loss = -torch.sum(p * target, dim=1)
         return torch.mean(loss)
     
