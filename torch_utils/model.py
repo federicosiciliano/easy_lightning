@@ -89,7 +89,7 @@ class BaseNN(pl.LightningModule):
         #for scheduler in self.lr_schedulers():
             #scheduler.step()     
 
-    def test_step(self, batch, batch_idx, split):
+    #def test_step(self, batch, batch_idx, split):
         #x, y, index = batch
         #y_hat,out = self(x)
         #loss = self.cross_entropy_loss(y_hat, y)
