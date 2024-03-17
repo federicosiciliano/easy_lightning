@@ -5,9 +5,6 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-# Initialize an empty list for the installation requirements
-install_requires = ["data_utils"]
-
 # Check if a requirements.txt file exists and if so, read its contents
 if os.path.isfile("requirements.txt"):
     with open("requirements.txt") as f:
@@ -21,8 +18,8 @@ setup(
     long_description=long_description,  # Use the contents of README.md as the long description
     long_description_content_type="text/markdown",
     version='0.0.1',  # Specify the version of your package
-    install_requires=install_requires,  # List of required dependencies
-    url='https://github.com/fed21',  # Replace with the URL of your GitHub repository
+    install_requires=['data_utils @ git+ssh://git@github.com/siciliano-diag/easy_lightning.git@<branch>'],  # List of required dependencies
+    url='https://github.com/siciliano-diag/easy_lightning.git',  # Replace with the URL of your GitHub repository
     author='Federico Siciliano, Federico Carmignani',
     author_email='siciliano@diag.uniroma1.it, carmignanifederico@gmail.com',
     keywords=['DeepLearning', 'MachineLearning', 'PyTorch', 'Lightning', 'AI']  # Keywords related to your package
