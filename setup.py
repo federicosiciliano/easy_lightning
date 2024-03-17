@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # Read the contents of the README.md file for the long description
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -16,7 +16,7 @@ if os.path.isfile("requirements.txt"):
 # Define the package setup configuration
 setup(
     name='Easy Lightning',  # Replace with your package name
-    packages=['exp_utils', 'data_utils', 'torch_utils'],  # List of all packages included in your project
+    packages=['data_utils'],  # List of all packages included in your project
     description='Easy Lightning: Simplify AI-Deep learning with PyTorch Lightning',  
     long_description=long_description,  # Use the contents of README.md as the long description
     long_description_content_type="text/markdown",
