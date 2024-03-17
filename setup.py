@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 # Initialize an empty list for the installation requirements
-install_requires = []
+install_requires = ["data_utils"]
 
 # Check if a requirements.txt file exists and if so, read its contents
 if os.path.isfile("requirements.txt"):
@@ -16,7 +16,7 @@ if os.path.isfile("requirements.txt"):
 # Define the package setup configuration
 setup(
     name='Easy Lightning',  # Replace with your package name
-    packages = (find_packages(where="./data_utils/")),  # List of all packages included in your project
+    packages = find_packages(),  # List of all packages included in your project
     description='Easy Lightning: Simplify AI-Deep learning with PyTorch Lightning',  
     long_description=long_description,  # Use the contents of README.md as the long description
     long_description_content_type="text/markdown",
