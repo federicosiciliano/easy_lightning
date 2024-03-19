@@ -23,6 +23,7 @@ setup(
     version='0.0.1',  # Specify the version of your package
     install_requires=install_requires+['data_utils @ git+https://github.com/siciliano-diag/data_utils.git',
                                        'exp_utils @ git+https://github.com/siciliano-diag/exp_utils.git',
+                                       'rec_utils @ git+https://github.com/siciliano-diag/rec_utils.git',
                                        'torch_utils @ git+https://github.com/siciliano-diag/torch_utils.git'],  # List of required dependencies
     url='https://github.com/siciliano-diag/easy_lightning.git',  # Replace with the URL of your GitHub repository
     author='Federico Siciliano, Federico Carmignani',
