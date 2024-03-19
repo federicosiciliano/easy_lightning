@@ -4,3 +4,6 @@
 [submodule "exp_utils"]
 	path = exp_utils
 	url = https://github.com/siciliano-diag/exp_utils.git
+[submodule "torch_utils"]
+	path = torch_utils
+	url = https://github.com/siciliano-diag/torch_utils.git
