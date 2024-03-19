@@ -1,3 +1,6 @@
 [submodule "data_utils"]
 	path = data_utils
 	url = https://github.com/siciliano-diag/data_utils.git
+[submodule "exp_utils"]
+	path = exp_utils
+	url = https://github.com/siciliano-diag/exp_utils.git
