@@ -1,12 +1,16 @@
 [submodule "data_utils"]
 	path = data_utils
 	url = https://github.com/siciliano-diag/data_utils.git
+	branch = main
 [submodule "exp_utils"]
 	path = exp_utils
 	url = https://github.com/siciliano-diag/exp_utils.git
+	branch = main
 [submodule "torch_utils"]
 	path = torch_utils
 	url = https://github.com/siciliano-diag/torch_utils.git
+	branch = main
 [submodule "rec_utils"]
 	path = rec_utils
 	url = https://github.com/siciliano-diag/rec_utils.git
+	branch = main
