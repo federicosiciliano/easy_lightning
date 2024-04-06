@@ -21,11 +21,11 @@ setup(
     long_description=long_description,  # Use the contents of README.md as the long description
     long_description_content_type="text/markdown",
     version='0.0.1',  # Specify the version of your package
-    install_requires=install_requires+['data_utils @ git+https://github.com/siciliano-diag/data_utils.git',
-                                       'exp_utils @ git+https://github.com/siciliano-diag/exp_utils.git',
-                                       'rec_utils @ git+https://github.com/siciliano-diag/rec_utils.git',
-                                       'torch_utils @ git+https://github.com/siciliano-diag/torch_utils.git'],  # List of required dependencies
-    url='https://github.com/siciliano-diag/easy_lightning.git',  # Replace with the URL of your GitHub repository
+    install_requires=install_requires+['easy_data @ git+https://github.com/PokeResearchLab/easy_data.git',
+                                       'easy_exp @ git+https://github.com/PokeResearchLab/easy_exp.git',
+                                       'easy_rec @ git+https://github.com/PokeResearchLab/easy_rec.git',
+                                       'easy_torch @ git+https://github.com/PokeResearchLab/easy_torch.git'],  # List of required dependencies
+    url='https://github.com/PokeResearchLab/easy_lightning.git',  # Replace with the URL of your GitHub repository
     author='Federico Siciliano, Federico Carmignani',
     author_email='siciliano@diag.uniroma1.it, carmignanifederico@gmail.com',
     keywords=['DeepLearning', 'MachineLearning', 'PyTorch', 'Lightning', 'AI']  # Keywords related to your package

@@ -3,7 +3,7 @@ data:
     name: MNIST
     source: torchvision #uci #tfds #custom #path_to_local_file
     # -split_vars:
-    #   value: "data_utils.utils.split_single_column"
+    #   value: "easy_data.utils.split_single_column"
     #   eval: eval
 
     merge_before_split: False
@@ -50,7 +50,7 @@ __exp__:
     # key_prefix: "" #Prefix for experiment key, optional, default = ""
     __imports__: #imports needed for config preparation (e.g. type casting)
       - torchvision
-        # - data_utils
+        # - easy_data
         # - numpy as np #" as " will be recognized
         # - name: pandas #" as " will be recognized
         #   fromlist:

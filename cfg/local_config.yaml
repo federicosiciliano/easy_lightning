@@ -5,7 +5,7 @@ data:
     loader_params:
         delimiter: ","
     # -split_vars:
-    #   value: "data_utils.utils.split_single_column"
+    #   value: "easy_data.utils.split_single_column"
     #   eval: eval
 
     merge_before_split: False
@@ -51,7 +51,7 @@ __exp__:
     # key_len: 16 #Length of experiment key, optional, default = 16
     # key_prefix: "" #Prefix for experiment key, optional, default = ""
     # imports: #imports needed for config preparation (e.g. type casting)
-    #     # - data_utils
+    #     # - easy_data
     #     # - numpy as np #" as " will be recognized
     #     # - name: pandas #" as " will be recognized
     #     #   fromlist:
