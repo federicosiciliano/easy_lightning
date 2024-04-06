@@ -1,0 +1,27 @@
+name: resnet18 #34
+#+ backend: torch
+
+#num_parameters: [1,10,100,200,1000]
+
+torchvision_params:
+  weights: Null
+    # - Null
+    # - -__:
+    #     value: torchvision.models.ResNet18_Weights
+    #     eval: eval
+
+#output_size: 1
+
+optimizer:
+  name: Adam
+  params:
+    lr: 1.0e-1
+    weight_decay: 0.0005
+
+loss: CrossEntropyLoss
+
+#seed: ${exp.seed}
+
++loader_params: loader_params_cfg
+
++trainer_params: trainer_params_cfg
