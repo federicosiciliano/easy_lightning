@@ -20,7 +20,7 @@ setup(
     description='Easy Lightning: Simplify AI-Deep learning with PyTorch Lightning',  
     long_description=long_description,  # Use the contents of README.md as the long description
     long_description_content_type="text/markdown",
-    version='0.0.1',  # Specify the version of your package
+    version='1.0.0',  # Specify the version of your package
     install_requires=install_requires+['easy_data @ git+https://github.com/PokeResearchLab/easy_data.git',
                                        'easy_exp @ git+https://github.com/PokeResearchLab/easy_exp.git',
                                        'easy_rec @ git+https://github.com/PokeResearchLab/easy_rec.git',
