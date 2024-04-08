@@ -3,7 +3,7 @@ data:
     #[adult,  australian,  breast-cancer-wisconsin,  bupa,  car,  cleveland,  covtype,  crx,  EEG%20Eye%20State,  german,  glass,  haberman,  heart,  hepatitis,  image,  ionosphere,  iris,  monks-1,  monks-2,  monks-3,  poker,  sonar]:
     source: torchvision #uci #tfds #custom #path_to_local_file
     # -split_vars:
-    #   value: "data_utils.utils.split_single_column"
+    #   value: "easy_data.utils.split_single_column"
     #   eval: eval
 
     merge_before_split: False
@@ -48,7 +48,7 @@ __exp__:
     # key_len: 16 #Length of experiment key, optional, default = 16
     # key_prefix: "" #Prefix for experiment key, optional, default = ""
     # imports: #imports needed for config preparation (e.g. type casting)
-    #     # - data_utils
+    #     # - easy_data
     #     # - numpy as np #" as " will be recognized
     #     # - name: pandas #" as " will be recognized
     #     #   fromlist:
