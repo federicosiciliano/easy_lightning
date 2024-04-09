@@ -5,9 +5,11 @@
 
 # Config (personal)
 cfg/wandb/*
+easy_rec/cfg/wandb/*
 
 # Data
 data/*
+easy_rec/data/*
 
 # Docs
 doc/*
