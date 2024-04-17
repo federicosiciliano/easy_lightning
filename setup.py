@@ -5,13 +5,18 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-with open('requirements.txt') as f:
-    required = f.read().splitlines()
+with open('colab_requirements.txt') as f:
+    colab_required = f.read().splitlines()
 
 # Check if a requirements.txt file exists and if so, read its contents
 if os.path.isfile("requirements.txt"):
     with open("requirements.txt") as f:
         install_requires = f.read().splitlines()
+
+submodules = ['easy_data @ git+https://github.com/PokeResearchLab/easy_data.git',
+              'easy_exp @ git+https://github.com/PokeResearchLab/easy_exp.git',
+              'easy_rec @ git+https://github.com/PokeResearchLab/easy_rec.git',
+              'easy_torch @ git+https://github.com/PokeResearchLab/easy_torch.git']
 
 # Define the package setup configuration
 setup(
@@ -21,10 +26,9 @@ setup(
     long_description=long_description,  # Use the contents of README.md as the long description
     long_description_content_type="text/markdown",
     version='1.0.0',  # Specify the version of your package
-    install_requires=install_requires+['easy_data @ git+https://github.com/PokeResearchLab/easy_data.git',
-                                       'easy_exp @ git+https://github.com/PokeResearchLab/easy_exp.git',
-                                       'easy_rec @ git+https://github.com/PokeResearchLab/easy_rec.git',
-                                       'easy_torch @ git+https://github.com/PokeResearchLab/easy_torch.git'],  # List of required dependencies
+    install_requires=[submodules],  # List of required dependencies
+    extras_require = {'all': install_requires,
+                      'colab': colab_required},
     url='https://github.com/PokeResearchLab/easy_lightning.git',  # Replace with the URL of your GitHub repository
     author='Federico Siciliano, Federico Carmignani',
     author_email='siciliano@diag.uniroma1.it, carmignanifederico@gmail.com',
