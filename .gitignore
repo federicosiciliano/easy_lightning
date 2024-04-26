@@ -15,7 +15,7 @@ easy_rec/data/*
 doc/*
 
 # Output
-out/model/*
+out/models/*
 *.pth
 
 ### DEFAULT GITIGNORE
