@@ -15,6 +15,7 @@ easy_rec/data/*
 doc/*
 
 # Output
+out/*
 out/models/*
 *.pth
 
