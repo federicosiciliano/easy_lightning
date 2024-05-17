@@ -33,7 +33,7 @@ setup(
     extras_require = {'all': install_requires,
                       'colab': colab_required},
     url='https://github.com/PokeResearchLab/easy_lightning.git',  # Replace with the URL of your GitHub repository
-    author='Federico Siciliano, Federico Carmignani',
+    author='???',
     author_email='siciliano@diag.uniroma1.it, carmignanifederico@gmail.com',
     keywords=['DeepLearning', 'MachineLearning', 'PyTorch', 'Lightning', 'AI']  # Keywords related to your package
 )
