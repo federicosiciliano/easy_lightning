@@ -69,10 +69,4 @@ Below is an outline of key files and folders you'll find in this project, along 
 
 By understanding the role of each file and folder, you'll be better equipped to navigate and work on the project.
 
-## 🧑‍🚀 Authors
-
-- **Federico Siciliano**: Researcher in Data Science at the University of La Sapienza of Rome.
-- **Federico Carmignani**: Master's Thesis Student in Engineering in Computer Science at the University of La Sapienza of Rome and Software Engineer at Sytel Reply.
-
-
 Start your deep learning journey with Easy Lightning today and experience a new level of simplicity and efficiency in creating and configuring AI-Deep learning notebooks.
