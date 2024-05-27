@@ -16,10 +16,10 @@ if os.path.isfile("requirements.txt"):
     with open("requirements.txt") as f:
         install_requires = f.read().splitlines()
 
-submodules = ['easy_data @ git+https://github.com/PokeResearchLab/easy_data.git',
-              'easy_exp @ git+https://github.com/PokeResearchLab/easy_exp.git',
-              'easy_rec @ git+https://github.com/PokeResearchLab/easy_rec.git',
-              'easy_torch @ git+https://github.com/PokeResearchLab/easy_torch.git']
+submodules = ['easy_data @ git+https://github.com/anonymoususer322/easy_data.git',
+              'easy_exp @ git+https://github.com/anonymoususer322/easy_exp.git',
+              'easy_rec @ git+https://github.com/anonymoususer322/easy_rec.git',
+              'easy_torch @ git+https://github.com/anonymoususer322/easy_torch.git']
 
 # Define the package setup configuration
 setup(
