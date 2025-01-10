@@ -4,16 +4,19 @@
 .DS_Store
 
 # Config (personal)
-cfg/wandb/*
+**/__wandb__/*
+**/wandb/*
 
 # Data
 data/*
+easy_rec/data/*
 
 # Docs
 doc/*
 
 # Output
-out/model/*
+out/*
+out/models/*
 *.pth
 
 ### DEFAULT GITIGNORE
