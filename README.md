@@ -56,10 +56,6 @@ To run our code follow the next steps:
   
 ``pip3 install  --upgrade --force-reinstall git+https://github.com/PokeResearchLab/easy_lightning.git``
 
-- Download this repo.
-  
-``git clone https://github.com/antoniopurificato/recsys_repro_conf && cd recsys_repro_conf``
-
 - Install the necessary requirements.
 
 ``pip3 install -r requirements.txt``
