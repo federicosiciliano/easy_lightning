@@ -2,6 +2,8 @@
 
 **EasyRec** is a versatile Python library carefully designed to streamline the process of configuring and building Sequential Recommender Systems models using the power and robust capabilites of PyTorch Lightning and PyTorch models.
 
+A more updated version can be found [here](https://github.com/PokeResearchLab/easy_lightning.git)
+
 ## 🌟 Key Features
 
 1. **User-Friendly Configuration:** EasyRec revolutionizes the way you work with Sequential Recommender Systems by providing a seamless configuration-based interface. All your settings can be easily defined in YAML files, making it effortless to customize and fine-tune your experiments.
