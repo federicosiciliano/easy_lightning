@@ -1,0 +1,27 @@
+[project]
+name = "EasyLightning"
+description = "Easy Lightning: Simplify AI-Deep learning with PyTorch Lightning"
+version = "0.2.6"
+authors = [
+  { name="Antonio Purificato", email="purificato@diag.uniroma1.it" },
+]
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = { text = "MIT" }
+
+[project.scripts]
+EasyLightning-init = "easy_lightning.cli:init_project"
+
+[tool.setuptools.package-data]
+"easy_lightning" = ["cfg/**/*"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[project.urls]
+Homepage = "https://github.com/PokeResearchLab/easy_lightning"
+Issues = "https://github.com/PokeResearchLab/easy_lightning/issues"

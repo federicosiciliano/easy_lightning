@@ -1,0 +1,20 @@
+/accelerator: auto
+/enable_checkpointing: True
+max_epochs: 1 #2000
+callbacks:
+    - EarlyStopping:
+        monitor: val_loss
+        mode: min
+        patience: 1
+
+    - ModelCheckpoint:
+        /dirpath: ${__exp__.project_folder}/out/models/${__exp__.name}/
+        /filename: best
+        save_top_k: 1
+        save_last: True
+        monitor: val_loss
+        mode: min
+/logger: #pl.loggers.CSVLogger("../out/log", name=str(experiment_id))
+    name: CSVLogger
+    params:
+        save_dir: ${__exp__.project_folder}/out/log/${__exp__.name}/

@@ -1,0 +1,68 @@
+
+app1:
+    foo_str: &reference_key string_value
+    foo_int: 123
+    foo_float: 1.23
+    foo_none: null
+    foo_list1: [123,"456",789.0]
+    foo_list2:
+        - 123
+        - "456"
+    -foo_parse1:
+        value: ["a","b","c"]
+        default: ["abc"]
+    -foo_parse2:
+        value: [1,2,3]
+        default: [123]
+        eval: np.array
+    -foo_parse3:
+        value: [[1,2,3],[4,5,6]]
+        default: [[123],[456]]
+        eval: DF
+    -/foo_parse4:
+        value: multiprocessing.cpu_count() #This will be a string
+        #default: [[123],[456]]
+        eval: eval
+    foo_ref1: ${app1.foo_str} #this is custom parsing. Doesn't require alias, just complete key-path
+    foo_ref2: *reference_key #this is yaml parsing. Requires setting an alias
+    +/app1_2: app1_2_file
+
++app2: app2_file
+
+#EXPERIMENT PARAMETERS
+#NOT SAVED AS PART OF THE CONFIGURATION
+__exp__:
+    name: prova #name of the experiment, optional, default = "experiment_name"
+    # project_folder: ../ #project folder, used to locate folders, optional, default = "../"
+    # key_len: 16 #Length of experiment key, optional, default = 16
+    # key_prefix: "" #Prefix for experiment key, optional, default = ""
+    __imports__: #imports needed for config preparation (e.g. type casting)
+        - numpy as np #" as " will be recognized
+        - name: pandas #" as " will be recognized
+          fromlist:
+            - DataFrame
+          as:
+            - DF
+        - multiprocessing
+
+#maybe should create __yaml__ key --> __imports__ and other stuff
+
+
+# if "-" or "--" at the start:
+#     use argparse:
+#         uses all argparse add_argument functions:
+#             default: especially useful --> used also to compensate previous experiments
+#         other keys:
+#             value: represent the current value
+#             eval: if use eval for transformation
+# if "+" at the start:
+#     load another yaml_file:
+#         inside <key> folder
+#         with <value> name
+# if "^" at the start:
+#     raise to previous configuration
+# if key="_global_":
+#     raise to global config
+# if no "special" character:
+#     interpret as key-value pair
+
