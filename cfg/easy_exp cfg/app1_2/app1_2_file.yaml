@@ -1,0 +1,9 @@
+foo_str1_2: app2_foo
+£foo_sweep1_2:
+    default: 1.2345
+    min: 0.1234
+    max: 5.6789
+
+__global__:
+    app1:
+        /app_glob1_2: "glob1_2"

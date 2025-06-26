@@ -1,0 +1,5 @@
+/foo_str: app2_foo_bis
+
+__global__:
+    app1:
+        app_glob: "glob_bis"

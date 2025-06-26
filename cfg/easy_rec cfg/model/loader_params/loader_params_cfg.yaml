@@ -1,0 +1,15 @@
+£batch_size:
+  default: 128 #2048
+  values: [32, 128, 512, 2048]
+  raytune:
+    name: qrandint
+    params:
+      lower: 16
+      upper: 2048
+      q: 16
+drop_last: True
+/num_workers: 1
+# shuffle: True
+/persistent_workers: False
+/pin_memory: False
+#multiprocessing_context: fork #if on MPS you may get RuntimeError: _share_filename_: only available on CPU

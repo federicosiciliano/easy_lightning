@@ -1,0 +1,30 @@
+name: SASRec
+£num_blocks:
+  default: 1
+  values: [1, 2, 3]
+  tune:
+    name: randint
+    params:
+      lower: 1
+      upper: 3
+
+£emb_size: 
+  default: 64
+  values: [32, 64, 128]
+  
+£num_heads: #must be a divisor of emb_size
+  default: 1
+  values: [1, 2, 4, 8]
+  tune:
+    name: choice
+    params:
+      categories: [1, 2, 4, 8]
+
+£dropout_rate:
+  default: 0.2
+  values: [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
+  tune:
+    name: uniform
+    params:
+      lower: 0.0
+      upper: 0.5

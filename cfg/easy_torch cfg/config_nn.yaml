@@ -1,0 +1,59 @@
+
+data:
+    name: MNIST
+    source: torchvision #uci #tfds #custom #path_to_local_file
+    # -split_vars:
+    #   value: "easy_data.utils.split_single_column"
+    #   eval: eval
+
+    merge_before_split: False
+    # merge_keys:
+    #   "x": ["train_x", "val_x", "test_x"]
+    #   "y": ["train_y", "val_y", "test_y"]
+    # -concat_function:
+    #     value: np.concatenate
+    #     eval: eval
+    # del_after_merge: True
+    
+    split_keys:
+      "train_x": ["train_x", "val_x"]
+      "train_y": ["train_y", "val_y"]
+    train_sizes: [100,100] # For prototyping
+    test_sizes: [0.2]
+      #int: number of samples, float: percentage of samples
+      #all values are relative to remaining data after each split
+    # train_sizes: None #not needed, unless you need less data in training after test split
+    split_random_state: 21094
+    # split_shuffle: True
+    # split_stratify: None
+    
+    # scaling_method: None
+    # scaling_params: {}
+    # scaling_keys: ["train_x", "val_x", "test_x"] #first one is the one used for fit
+    # scaling_fit_params: {}
+    # scaling_transform_params: [{},{},{}]
+
+    one_hot_encode: True
+    # onehotencoder_params:
+    #     handle_unknown: ignore
+    #     sparse: False
+
+    scaling: MinMax #None #Standard #MinMax
+
++model: resnet
+
+# EXPERIMENT PARAMETERS - NOT SAVED AS PART OF THE CONFIGURATION
+__exp__:
+    name: prova #name of the experiment, optional, default = "experiment_name"
+    # project_folder: ../ #project folder, used to locate folders, optional, default = "../"
+    # key_len: 16 #Length of experiment key, optional, default = 16
+    # key_prefix: "" #Prefix for experiment key, optional, default = ""
+    __imports__: #imports needed for config preparation (e.g. type casting)
+      - torchvision
+        # - easy_data
+        # - numpy as np #" as " will be recognized
+        # - name: pandas #" as " will be recognized
+        #   fromlist:
+        #     - DataFrame
+        #   as:
+        #     - DF

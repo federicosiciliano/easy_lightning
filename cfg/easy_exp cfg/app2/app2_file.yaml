@@ -1,0 +1,9 @@
+/foo_str: app2_foo
+£foo_sweep:
+    default: "hey"
+    values: ["hi","hey","hello"]
++app3: app3_name
+
+__global__:
+    app1:
+        app_glob: "glob"
