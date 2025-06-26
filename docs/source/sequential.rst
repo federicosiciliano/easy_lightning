@@ -1,10 +1,10 @@
-easy_rec.model.sequential package
+Recsys Models package
 =================================
 
 Submodules
 ----------
 
-easy_rec.model.sequential.BERT4Rec module
+BERT4Rec module
 -----------------------------------------
 
 .. automodule:: easy_rec.model.sequential.BERT4Rec
@@ -12,7 +12,7 @@ easy_rec.model.sequential.BERT4Rec module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.CORE module
+CORE module
 --------------------------------------
 
 .. automodule:: easy_rec.model.sequential.CORE
@@ -20,7 +20,7 @@ easy_rec.model.sequential.CORE module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.Caser module
+Caser module
 --------------------------------------
 
 .. automodule:: easy_rec.model.sequential.Caser
@@ -28,7 +28,7 @@ easy_rec.model.sequential.Caser module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.CosRec module
+CosRec module
 ---------------------------------------
 
 .. automodule:: easy_rec.model.sequential.CosRec
@@ -36,7 +36,7 @@ easy_rec.model.sequential.CosRec module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.GRU4Rec module
+GRU4Rec module
 -----------------------------------------
 
 .. automodule:: easy_rec.model.sequential.GRU4Rec
@@ -44,7 +44,7 @@ easy_rec.model.sequential.GRU4Rec module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.HGN module
+HGN module
 ------------------------------------
 
 .. automodule:: easy_rec.model.sequential.HGN
@@ -52,7 +52,7 @@ easy_rec.model.sequential.HGN module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.NARM module
+NARM module
 -------------------------------------
 
 .. automodule:: easy_rec.model.sequential.NARM
@@ -60,7 +60,7 @@ easy_rec.model.sequential.NARM module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.NextItNet module
+NextItNet module
 ------------------------------------------
 
 .. automodule:: easy_rec.model.sequential.NextItNet
@@ -68,7 +68,7 @@ easy_rec.model.sequential.NextItNet module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.POP module
+POP module
 ------------------------------------
 
 .. automodule:: easy_rec.model.sequential.POP
@@ -76,7 +76,7 @@ easy_rec.model.sequential.POP module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.SASRec module
+SASRec module
 ---------------------------------------
 
 .. automodule:: easy_rec.model.sequential.SASRec
@@ -84,7 +84,7 @@ easy_rec.model.sequential.SASRec module
    :undoc-members:
    :show-inheritance:
 
-easy_rec.model.sequential.Seq4Rec module
+Seq4Rec module
 ----------------------------------------
 
 .. automodule:: easy_rec.model.sequential.Seq4Rec

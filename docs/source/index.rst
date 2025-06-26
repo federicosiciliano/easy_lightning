@@ -1,5 +1,5 @@
 Welcome to Easy Lightning's documentation!
-=======================================
+==========================================
 
 .. image:: _static/logo.png
    :alt: logo
