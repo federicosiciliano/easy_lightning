@@ -11,3 +11,5 @@ Welcome to Easy Lightning's documentation!
    :caption: Contents:
 
    modules
+
+   config
