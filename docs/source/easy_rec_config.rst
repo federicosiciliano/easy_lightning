@@ -1,5 +1,5 @@
 easy_rec config
-==============
+===============
 
 Dataset parameters 
 -----------------------------------------
@@ -146,7 +146,7 @@ SASRec
 
 
 Global Data Parameters
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~
 They declare global defaults or shared parameters within the whole config structure.
 
 - ``data_params.collator_params.lookforward (int)`` – Number of future items to look ahead when generating training instances. Default to **0**.
@@ -156,7 +156,7 @@ They declare global defaults or shared parameters within the whole config struct
 - ``data_params.collator_params.keep_last.test (int or null)`` – Number of last interactions to keep for test.  If `null`, all test interactions are kept. Default: **null**.
 
 Step Routing Parameters 
-~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
 They define how data flows through the model during training, validation and test.
 
 - ``model_input_from_batch (list of str)`` – Specifies which keys from the input batch are passed as inputs to the model. Default to `[in_sid, out_sid]`, where `in_sid` refers to the input sequence IDs, and `out_sid` refers to the target sequence IDs.

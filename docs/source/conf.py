@@ -4,7 +4,10 @@ import os
 import sys
 # sys.path.insert(0, os.path.abspath('.'))
 # sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-sys.path.insert(0, os.path.abspath('../../easy_lightning'))  # points to the outer easy_lightning
+sys.path.insert(0, os.path.abspath('../../src/easy_lightning'))  # points to the outer easy_lightning
+# sys.path.insert(0, os.path.abspath('../../easy_lightning/easy_rec'))  # points to the inner easy_rec
+# sys.path.insert(0, os.path.abspath('../../easy_lightning/easy_data'))  # points to the inner easy_data
+
 # sys.path.insert(0, os.path.abspath('../../easy_rec')) # points to the inner easy_data
 print("sys.path[0]:", sys.path[0])
 print("Contents of sys.path[0]:", os.listdir(sys.path[0]))
