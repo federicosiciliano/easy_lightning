@@ -24,7 +24,7 @@ This structured configuration ensures consistency, reusability, and clarity acro
 
 
 **Note**:
-Both **Easy Torch** and **Easy Rec** support seamless integration with **PyTorch** and **PyTorch Lightning**. Models, checkpoints, loss functions, and metrics can be directly referenced from these frameworks using string-based import paths in the YAML configuration (e.g., `torch.nn.CrossEntropyLoss`). This design provides full flexibility and extensibility while maintaining the simplicity of EasyLightning's unified configuration system.
+Both **Easy Torch** and **Easy Rec** support seamless integration with **PyTorch** and **PyTorch Lightning**. Models, checkpoints, loss functions, and metrics can be directly referenced from these frameworks using string-based import paths in the YAML configuration (e.g., ``CrossEntropyLoss``). This design provides full flexibility and extensibility while maintaining the simplicity of EasyLightning's unified configuration system.
 
 Easy Rec
 --------
