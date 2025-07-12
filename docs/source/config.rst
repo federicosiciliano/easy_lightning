@@ -21,7 +21,12 @@ Each section of the YAML file corresponds to a major component of the pipeline, 
 
 This structured configuration ensures consistency, reusability, and clarity across projects, making it easy to scale or adapt experiments to new scenarios with minimal effort.
 
-Easy Rec 
+
+
+**Note**:
+Both **Easy Torch** and **Easy Rec** support seamless integration with **PyTorch** and **PyTorch Lightning**. Models, checkpoints, loss functions, and metrics can be directly referenced from these frameworks using string-based import paths in the YAML configuration (e.g., `torch.nn.CrossEntropyLoss`). This design provides full flexibility and extensibility while maintaining the simplicity of EasyLightning's unified configuration system.
+
+
 --------
 .. toctree::
    :maxdepth: 4
@@ -34,3 +39,34 @@ Easy Torch
    :maxdepth: 4
 
    easy_torch_config
+
+Special Characters
+------------------
+
+YAML configuration files in EasyLightning use special characters to control behavior in experiment definitions. Proper quoting and formatting are essential to avoid parsing errors.
+
+Below are some special characters and their usage:
+
+1. £ (Sweep Operator)
+
+   The `£` prefix is used to define a hyperparameter sweep over a range of values.
+
+   Example:
+     £learning_rate:
+       default: 0.001
+       values: [0.001, 0.01, 0.1]
+
+   In your `quick_start.py` script, you can iterate over the sweep like this:
+
+     for _ in cfg.sweep(cfg["model"]["learning_rate"]):
+
+   This enables automatic experimentation over multiple values. See `quick_start.py` for more details.
+
+2. / (Exclude from Config and Experiment ID)
+
+   The `/` prefix marks a parameter as **excluded** from being saved in the final config file and from affecting the `exp_id` (experiment identifier).
+
+   Example:
+     /learning_rate: 0.001
+
+   This means the parameter will be used during execution but ignored when saving configuration files or generating experiment names.

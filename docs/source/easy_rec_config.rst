@@ -6,36 +6,36 @@ Dataset parameters
 - ``name (str)`` – Name of the dataset to use, e.g. `ml-1m`, `amazon_beauty`, `behance`. Default to **ml-100k**.
 - ``data_folder (str)`` – Path to the raw dataset folder. Default to **../data/raw/**.
 - ``min_rating (int or float)`` – Minimum rating threshold. Interactions below this value will be filtered out. Default to **0**.
-- ``min_items_per_user (int)`` – Minimum number of items a user must have interacted with. Default to **5**.
-- ``min_users_per_item (int)`` – Minimum number of users that must have interacted with an item. Default to **5**.
+- ``min_items_per_user (int)`` – Minimum number of items a user must have interacted with. Interactions below this value will be filtered out. Default to **5**.
+- ``min_users_per_item (int)`` – Minimum number of users that must have interacted with an item. Interactions below this value will be filtered out. Default to **5**.
 - ``densify_index (bool)`` – If ``True``, user and item indices will be re-mapped to a contiguous range. Default to **True**.
-- ``split_method (str)`` – Method used to split the dataset into train/val/test sets. Options in [`leave_n_out`, `hold_out`, `k_fold`]. Default to **leave_n_out**.
+- ``split_method (str)`` – Method used to split the dataset into train/val/test sets. Default to **leave_n_out**, for the moment is the only option.
 - ``test_sizes (list of int or null)`` – Number of final interactions kept for validation and test sets. Default to **[1, 1]**.
 - ``dataset_params``
     - ``split_keys (dict)`` – Keys used to group data for splitting. Default to `{train: [sid, uid], val: [sid, uid], test: [sid, uid]}`.
 - ``collator_params``
     - ``sequential_keys (list of str)`` – Keys used to identify sequence order. Default to **[sid]**.
     - ``padding_value (int)`` – Value used to pad sequences. Default to **0**.
-    - ``lookback (int)`` – Number of past items to include in each training sample. Default to **200**.
+    - ``lookback (int)`` – Number of past items to include in each training sample i.e. length of the sequence. Default to **200**.
     - ``lookforward (int)`` – Number of future items to predict. Default to **1**.
     - ``simultaneous_lookforward (int)`` – Number of future steps included in a single prediction step. Default to **1**.
     - ``out_seq_len (dict)`` – Output sequence length per split.  
         - ``train``- Default to **null**. 
         - ``val`` - Default to **1** . 
         - ``test``- Default to **1**.
-    - ``num_negatives (dict)`` – Number of negative samples per positive example.  
+    - ``num_negatives (dict)`` – Number of negative samples per positive example. To include all in a set, put `1.` .
         - ``train`` - Default to  **1**.
         - ``val`` - Default to **100**. 
         - ``test`` - Default to **100**.
 
-    - ``negatives_distribution (str)`` – Strategy for sampling negatives. Default to **uniform**.
+    - ``negatives_distribution (str)`` – Strategy for sampling negatives. Default to **uniform**, for the moment it's the only option. 
 
 
 
 Loader parameters
 -----------------------------------------
 - ``batch_size (int)`` – Number of samples processed in each training batch. Default to **128**.
-- ``drop_last (bool)`` – If `True`, discards the last batch if it contains fewer than `batch_size` samples. Default to **True**.
+- ``drop_last (bool)`` – If `True`, discards the last batch if it contains fewer than `batch_size` samples. Default to **True**. See this link for more details https://discuss.pytorch.org/t/usage-of-drop-last-on-data-loader/66741 .
 - ``num_workers (int)`` – The number of workers processing the data. Default to **1**.
 - ``shuffle (bool)`` – If `True`, shuffles the dataset at every epoch. Default to **True**.
 - ``persisent_workers (bool)`` –  If `True`, worker processes remain active between epochs to improve loading speed. Default to **False**.
