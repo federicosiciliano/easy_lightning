@@ -4,10 +4,22 @@ import pytorch_lightning as pl
 import torchmetrics
 
 class BaseNN(pl.LightningModule):
+    """ Base class for a neural network model in PyTorch Lightning.
+    This class serves as a base for creating neural network models with customizable components such as the 
+    main module, loss function, optimizer, and metrics.
+    It also provides methods for logging, computing model outputs, losses, and metrics.
+    Args:
+        main_module (torch.nn.Module): The main neural network module.
+        loss (torch.nn.Module or dict): The primary loss function or a dictionary of loss functions.
+        optimizer (callable): The optimizer function to be used for training.
+        metrics (dict): A dictionary of metrics to be used for evaluation.
+        log_params (dict): Parameters for logging, such as whether to log on epoch end.
+        step_routing (dict): A dictionary defining how batch and model output are routed to the model, loss, and metrics.
+    """
     def __init__(self, main_module, loss, optimizer, metrics={}, log_params={},
-                 step_routing = {"model_input_from_batch":[0],
-                                 "loss_input_from_batch": [1], "loss_input_from_model_output": None,
-                                 "metrics_input_from_batch": [1], "metrics_input_from_model_output": None},
+                step_routing = {"model_input_from_batch":[0],
+                                "loss_input_from_batch": [1], "loss_input_from_model_output": None,
+                                "metrics_input_from_batch": [1], "metrics_input_from_model_output": None},
                  **kwargs): #TODO? change step order in computation: first model_output then batch
         super().__init__()
 
@@ -29,9 +41,18 @@ class BaseNN(pl.LightningModule):
         # Define a custom logging function
         self.log_params = log_params
 
+
     def log(self, name, value):
+        """
+        Custom logging function that handles logging of metrics and values.
+
+        Args:
+            name (str): Base name for the metric or value.
+            value (Any): Value to log, which can be a scalar, dict, or torchmetrics.MetricCollection.
+        """
         original_log_function = super().log
         if value is not None:
+            # If value is a dictionary or a MetricCollection, log each item separately
             if isinstance(value, dict) or isinstance(value, torchmetrics.MetricCollection):
                 for key,value_to_log in value.items():
                     log_name = "_".join([x for x in [name, key] if x is not None and x != ""])
@@ -44,6 +65,7 @@ class BaseNN(pl.LightningModule):
                     #             writer_object.writerow([log_key,*to_log.cpu().detach().tolist()])
                     #             f_object.close()
                     # else:
+            # Otherwise, log the value directly
             else:
                 original_log_function(name, value, **self.log_params)
 
@@ -70,26 +92,54 @@ class BaseNN(pl.LightningModule):
         #     else:
         #         original_log_function(name, value, **self.log_params)
 
-    # Define the forward pass of the neural network
+    
     def forward(self, *args, **kwargs):
+        """
+        Forward pass through the main module.
+
+        Returns:
+            torch.Tensor or Any: Output of the main model.
+        """
         return self.main_module(*args, **kwargs)
 
-    # Configure the optimizer for training
+
     def configure_optimizers(self):
+        """
+        Configure the optimizer for training.
+
+        Returns:
+        torch.optim.Optimizer: Instantiated optimizer for model parameters.
+        """
         optimizer = self.optimizer(self.parameters())   
         return optimizer
 
-    # Define a step function for processing a batch
+
     def step(self, batch, batch_idx, dataloader_idx, split_name): #not a lightning method
         #TODO: what to do with batch_idx and dataloader_idx?
+        """
+        Common step function for processing a batch.
+
+        Args:
+            batch (Any): Input batch from the dataloader.
+            batch_idx (int): Index of the batch.
+            dataloader_idx (int): Index of the dataloader (used for multi-dataloader scenarios).
+            split_name (str): One of ["train", "val", "test", "predict"].
+
+        Returns:
+            dict: Dictionary containing model output, loss (if applicable), and metrics (if applicable).
+        """
+        # Compute the model output
+        # Use the routing defined in step_routing to get the model input from the batch
         model_output = self.compute_model_output(batch, self.step_routing["model_input_from_batch"])
         lightning_module_return = {"model_output": model_output}
 
+        # If loss is defined, compute the loss using the routing for loss input and the model output
         if self.loss is not None:
             lightning_module_return["loss"] = self.compute_loss(self.loss, batch, self.step_routing["loss_input_from_batch"],
-                                     model_output, self.step_routing["loss_input_from_model_output"],
-                                     split_name, dataloader_idx)
+                                    model_output, self.step_routing["loss_input_from_model_output"],
+                                    split_name, dataloader_idx)
 
+        # If metrics are defined, compute the metrics using the routing for metrics input and the model output
         if len(self.metrics)>0:
             lightning_module_return["metric_values"] = self.compute_metrics(batch, self.step_routing["metrics_input_from_batch"],
                                                 model_output, self.step_routing["metrics_input_from_model_output"],
@@ -99,6 +149,15 @@ class BaseNN(pl.LightningModule):
         return lightning_module_return
 
     def compute_model_output(self, batch, model_input_from_batch):
+        """ 
+        Compute the model output given a batch and the routing for model input.
+
+        Args:
+            batch (Any): Input batch from the dataloader.
+            model_input_from_batch (list or dict): Routing for model input from the batch.
+        Returns:
+            torch.Tensor or Any: Output of the model.   
+        """
         model_input_args, model_input_kwargs = self.get_input_args_kwargs((batch, model_input_from_batch))
 
         model_output = self(*model_input_args, **model_input_kwargs)
@@ -106,18 +165,34 @@ class BaseNN(pl.LightningModule):
         return model_output
     
     def get_input_args_kwargs(self, *args):
+        """ 
+        Get postional arguments and keyword arguments from the provided args.
+
+        Args:
+            *args: A tuple of objects and their corresponding keys.
+        
+        Returns:
+            input_args (list): List of positional arguments extracted from the objects.
+            input_kwargs (dict): Dictionary of input keyword arguments extracted from the objects.
+        """
         input_args, input_kwargs = [],{}
         for obj,keys in args:
+            # # If keys is a single int or str, convert it to a list for uniformity
             if isinstance(keys, int) or isinstance(keys, str):
                 keys = [keys]
+            # if keys is a list, extract multiple elements and append to postional args
             if isinstance(keys, list):
                 input_args += [obj[i] for i in keys]
+            # if key is a dictionary, we assume it is a mapping of keys to indices or None
             elif isinstance(keys, dict):
                 for k,i in keys.items():
+                    # If index is None, pass the whole object as that keyword argument
                     if i is None:
                         input_kwargs[k] = obj
+                    # Otherwise, extract and value the value at the index i
                     else:
                         input_kwargs[k] = obj[i]
+            # if keys is None, we assume the whole object is the input 
             elif keys is None:
                 input_args.append(obj)
             else:
@@ -125,33 +200,86 @@ class BaseNN(pl.LightningModule):
         return input_args, input_kwargs
 
     def compute_loss(self, loss_object, batch, loss_input_from_batch, model_output, loss_input_from_model_output, split_name, dataloader_idx):
+        """
+        Compute the loss given a batch and the routing for loss input.
+        Args:
+            loss_object (torch.nn.Module or dict): The loss function or a dictionary of loss functions.
+            batch (Any): Input batch from the dataloader.               
+            loss_input_from_batch (list or dict): Routing for loss input from the batch.
+            model_output (torch.Tensor or Any): Output of the model.
+            loss_input_from_model_output (list or dict): Routing for loss input from the model output.
+            split_name (str): Data split name.
+            dataloader_idx (int): Index of the dataloader (used for multi-dataloader scenarios).
+        Returns:
+            torch.Tensor: Computed loss value.
+        """
+        
         if isinstance(loss_object, torch.nn.ModuleDict):
+            # If loss_object contains a specific loss function for the split_name, compute that loss
             if split_name in loss_object:
                 loss = self.compute_loss(loss_object[split_name], batch, loss_input_from_batch, model_output, loss_input_from_model_output, split_name, dataloader_idx)
+            # Otherwise, we compute the loss for each loss function in the dictionary
             else:
                 loss = torch.tensor(0.0, device=self.device)
+                # Compute each loss using the _compute method -which will handle the routing for each loss function-,
+                # multiply it by its weight (if it exists), and accumulate the total loss
                 for i, (loss_name, loss_func) in enumerate(loss_object.items()):
                     single_loss = self._compute(loss_name, loss_func, batch, loss_input_from_batch, model_output, loss_input_from_model_output, split_name)
-                    weight = getattr(loss_object[loss_name], '__weight__', 1.0) #get weight if it exists
+                    weight = getattr(loss_object[loss_name], '__weight__', 1.0) # get weight if it exists
                     loss += weight * single_loss
-                self.log(split_name+'_loss', loss)
+                self.log(split_name+'_loss', loss)    
         elif isinstance(loss_object, torch.nn.ModuleList):
+            # Use the dataloader_idx to select the appropriate loss function from the list and compute the loss
             loss = self.compute_loss(loss_object[dataloader_idx], batch, loss_input_from_batch, model_output, loss_input_from_model_output, split_name, dataloader_idx)
         else:
             loss = self._compute("loss", loss_object, batch, loss_input_from_batch, model_output, loss_input_from_model_output, split_name)
         return loss
     
+    # Compute metrics given a batch and the routing for metrics input
     def compute_metrics(self, batch, metrics_input_from_batch, model_output, metrics_input_from_model_output, split_name, dataloader_idx):
+        """
+        Compute metrics using the specified metric functions.
+
+        Args:
+            batch (Any): Input batch from the dataloader.   
+            metrics_input_from_batch (list or dict): Routing for metrics input from the batch.
+            model_output (torch.Tensor or Any): Output of the model.
+            metrics_input_from_model_output (list or dict): Routing for metrics input from the model output.
+            split_name (str): Data split name.
+            dataloader_idx (int): Index of the dataloader (used for multi-dataloader scenarios).
+        
+        Returns:
+            dict: Dictionary containing computed metric values.
+        """
+        
         metric_values = {}
         for metric_name, metric_func in self.metrics[split_name][dataloader_idx].items():
             metric_values[metric_name] = self._compute(metric_name, metric_func, batch, metrics_input_from_batch, model_output, metrics_input_from_model_output, split_name)
         return metric_values
     
+    # Compute a metric or loss given the name, function, batch, and routing information
     def _compute(self, name, func, batch, input_from_batch, model_output, input_from_model_output, split_name):
-        # If metrics_input is a dictionary, routing is different for each metric
+        """
+        Compute a loss or metric value by extracting inputs from batch and model_output according to routing,
+        and then applying the given function `func`.
+
+        Args:
+            name (str): Name of the metric or loss function.
+            func (callable): The metric or loss function to compute.
+            batch (Any): Input batch from the dataloader.
+            input_from_batch (list or dict): Routing for inputs from the batch.
+            model_output (torch.Tensor or Any): Output of the model.
+            input_from_model_output (list or dict): Routing for inputs from the model output.
+            split_name (str): Data split name.
+
+        Returns:
+            Any: Computed value from the function `func`, which can be a scalar, tensor, or a torchmetrics.MetricCollection.
+        """
+        # Extract the routing for inputs from the batch and model output
         batch_routing = self.get_key_if_dict_and_exists(input_from_batch, name)
         output_routing = self.get_key_if_dict_and_exists(input_from_model_output, name)
 
+        # Get the input arguments and keyword arguments for the function
         input_args, input_kwargs = self.get_input_args_kwargs((batch, batch_routing), (model_output, output_routing))
 
         # if isinstance(func, torchmetrics.Metric): #This can compute the metric across batches #TODO? choose if we want to compute the metric across batches or not
@@ -160,16 +288,26 @@ class BaseNN(pl.LightningModule):
         #     value = func#.compute()
         #     print("TOT:",func.total)
         # else:
-        value = func(*input_args, **input_kwargs) #if a torchmetrics metric, this will get the values just for this batch
-        if isinstance(func, torchmetrics.Metric) or isinstance(func, torchmetrics.MetricCollection): #This won't work if the TorchMetrics.Metric returns a dict, cause Torchmetrics wants a tensor
+
+        # Compute the value using the function `func` with the provided input arguments and keyword arguments
+        # If `func` is a torchmetrics.Metric, it will return the value for the current batch
+        value = func(*input_args, **input_kwargs) 
+
+        # If `func` is a torchmetrics.Metric or MetricCollection, we will log it directly
+        # Note: This won't work if the TorchMetrics.Metric returns a dict instead of a tensor
+        if isinstance(func, torchmetrics.Metric) or isinstance(func, torchmetrics.MetricCollection): 
             value = func
 
+        # Log the value 
         log_name = split_name+'_'+name
         self.log(log_name, value)
 
         return value
     
     def get_key_if_dict_and_exists(self, obj, key):
+        # If obj is a dictionary and contains the key, return the value associated with the key.
+        # Otherwise, return the object itself.
+        # This is useful for routing inputs from batch or model output.
         if isinstance(obj, dict) and key in obj:
             return obj[key]
         else:
@@ -228,7 +366,7 @@ class BaseNN(pl.LightningModule):
     #         for metric in metrics.values():
     #             self.reset_metrics(metric)
 
-# Define functions for getting and loading torchvision models
+## Define functions for getting and loading torchvision models
 def get_torchvision_model(*args, **kwargs): return torchvision_utils.get_torchvision_model(*args, **kwargs)
 #TODO: add set seed
 
@@ -241,6 +379,15 @@ def load_torchvision_model(*args, **kwargs): return torchvision_utils.load_torch
 
 # Define an Identity module
 class Identity(torch.nn.Module):
+    """
+    An Identity module that returns the input as is.
+    This module can be used as a placeholder in a neural network architecture.
+    It does not perform any operation on the input and simply returns it.
+    Args:
+        None
+    Returns:
+        torch.Tensor: The input tensor is returned unchanged.
+    """
     def __init__(self):
         super().__init__()
 
@@ -249,6 +396,14 @@ class Identity(torch.nn.Module):
 
 # Define a LambdaLayer module
 class LambdaLayer(torch.nn.Module):
+    """ 
+    A LambdaLayer module that applies a custom function to the input.
+    It is useful for applying custom transformations or operations in a neural network.
+    Args:
+        lambd (callable): A function that takes a tensor as input and returns a tensor as output.
+    Returns:
+        torch.Tensor: The output tensor after applying the custom function.          
+    """
     def __init__(self, lambd):
         super(LambdaLayer, self).__init__()
         self.lambd = lambd
