@@ -4,7 +4,7 @@ description = "Easy Lightning: Simplify AI-Deep learning with PyTorch Lightning"
 version = "1.0.0"
 authors = [
   { name="Filippo Betello", email="betello@diag.uniroma1.it" },
-  { name="Maria Diana Calagaru", email="calagaru@diag.uniroma1.it" },
+  { name="Maria Diana Calugaru", email="calugaru@diag.uniroma1.it" },
   { name="Antonio Purificato", email="purificato@diag.uniroma1.it" },
   { name="Federico Siciliano", email="siciliano@diag.uniroma1.it" },
 ]

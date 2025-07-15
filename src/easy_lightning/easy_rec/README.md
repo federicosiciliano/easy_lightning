@@ -83,4 +83,4 @@ To run our code follow the next steps:
 ```
 
 #### Contributors
-Federico Siciliano, Filippo Betello, Antonio Purificato, Giulia Di Teodoro, Maria Diana Calagaru, Erica Luciani, Federico Carmignani.
+Federico Siciliano, Filippo Betello, Antonio Purificato, Maria Diana Calugaru, Erica Luciani, Giulia Di Teodoro, Federico Carmignani.
