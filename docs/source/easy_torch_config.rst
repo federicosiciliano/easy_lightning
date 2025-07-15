@@ -23,7 +23,7 @@ Loader Parameters
 
 Trainer Parameters
 -----------------------------------------
-- ``accelerator (str)`` – Type of accelerator to use. Options in [`cpu`, `gpu`, `auto`]. Default to **auto**.
+- ``accelerator (str)`` – Type of accelerator to use. Options in [`cpu`, `gpu`, `mps`]. Default to **cpu**.
 - ``enable_checkpointing (bool)`` – Whether to save checkpoints during training. Default to **True**.
 - ``max_epochs (int)`` – Maximum number of training epochs. Default to **1**.
 - ``callbacks (list of dict)`` – List of training callbacks.

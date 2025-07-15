@@ -1,6 +1,0 @@
-/foo_str: app2_foo
-+app3: app3_name
-
-__global__:
-    app1:
-        app_glob: "glob"

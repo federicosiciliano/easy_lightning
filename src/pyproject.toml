@@ -1,9 +1,12 @@
 [project]
 name = "EasyLightning"
 description = "Easy Lightning: Simplify AI-Deep learning with PyTorch Lightning"
-version = "0.2.6"
+version = "1.0.0"
 authors = [
+  { name="Filippo Betello", email="betello@diag.uniroma1.it" },
+  { name="Maria Diana Calugaru", email="calugaru@diag.uniroma1.it" },
   { name="Antonio Purificato", email="purificato@diag.uniroma1.it" },
+  { name="Federico Siciliano", email="siciliano@diag.uniroma1.it" },
 ]
 readme = "README.md"
 requires-python = ">=3.8"
@@ -12,6 +15,18 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 license = { text = "MIT" }
+
+dependencies = [
+  "torch",
+  "torchvision",
+  "torchmetrics",
+  "pytorch-lightning",
+  "pandas",
+  "imageio",
+  "scikit-learn",
+  "ray[tune]",
+  "wandb"
+]
 
 [project.scripts]
 EasyLightning-init = "easy_lightning.cli:init_project"
@@ -23,5 +38,5 @@ EasyLightning-init = "easy_lightning.cli:init_project"
 where = ["."]
 
 [project.urls]
-Homepage = "https://github.com/PokeResearchLab/easy_lightning"
-Issues = "https://github.com/PokeResearchLab/easy_lightning/issues"
+Homepage = "https://github.com/federicosiciliano/easy_lightning"
+Issues = "https://github.com/federicosiciliano/easy_lightning/issues"
