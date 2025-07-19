@@ -1,13 +1,11 @@
 #Put all imports here
 import os
 import easy_lightning
-import sys
+
 from copy import deepcopy
 
-project_root = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.join(project_root, '../src'))
 
-from easy_lightning2 import easy_exp, easy_rec, easy_torch
+from easy_lightning import easy_exp, easy_rec, easy_torch
 
 
 def main():
