@@ -323,15 +323,21 @@ def prepare_model(model_cfg):
 def prepare_emission_tracker(experiment_id, **tracker_kwargs):
     from codecarbon import EmissionsTracker
     # Update the "output_dir" in tracker parameters to include the experiment_id
+    tracker_kwargs.pop("use", None)
     tracker_kwargs["output_dir"] = tracker_kwargs.get("output_dir", "../out/log/") + experiment_id + "/"
+    print(f"Tracker output directory: {tracker_kwargs['output_dir']}")
+    
     tracker = EmissionsTracker(**tracker_kwargs)
     return tracker
 
 def prepare_flops_profiler(model, experiment_id, **profiler_kwargs):
     from deepspeed.profiling.flops_profiler import FlopsProfiler
+    profiler_kwargs.pop("use", None)  # Remove 'use' key if it exists
     output_dir = profiler_kwargs.pop("output_dir", "../out/log/")
     profiler = FlopsProfiler(model, **profiler_kwargs)
     profiler.output_dir = output_dir + experiment_id + "/"
+    print(f"Profiler output directory: {profiler.output_dir}")
+    
     return profiler
 
 """

@@ -23,7 +23,7 @@ collator_params:
   padding_value: 0 #the padding value for the dataset
   £lookback: #the lookback of the dataset
     default: 10
-    values: [5, 10] #, 10, 20]
+    values: [5] #, 10, 20]
     # tune:
     #   name: choice
     #   params:
