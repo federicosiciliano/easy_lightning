@@ -13,6 +13,7 @@ data/*
 doc/*
 
 # Output
+out/*
 out/model/*
 *.pth
 

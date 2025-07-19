@@ -3,12 +3,12 @@ optimizer:
   params:
     £lr:
       default: 1.0e-3
-      values: [1.0e-1, 1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5]
-      tune:
-        name: uniform #loguniform
-        params:
-          lower: 1.0e-5
-          upper: 1.0e-1
+      values: [1.0e-1] #, 1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5]
+      # tune:
+      #   name: uniform #loguniform
+      #   params:
+      #     lower: 1.0e-5
+      #     upper: 1.0e-1
     # betas: [0.9, 0.98]
 
 loss: SequentialBCEWithLogitsLoss #SequentialCrossEntropyLoss #SequentialBPR #SequentialBCEWithLogitsLoss
@@ -19,23 +19,24 @@ loss: SequentialBCEWithLogitsLoss #SequentialCrossEntropyLoss #SequentialBPR #Se
 #       beta: 0.5
 
 metrics:
-  #- Precision
-  #- Recall
-  # - F1
-  #- MAP
-  FakeMetricCollection:
-    metric_class: NDCG
-  # - RLS_Jaccard
-  # - RLS_RBO
-  # - RLS_FRBO 
+  - FakeMetricCollection:Precision
+  - FakeMetricCollection:Recall
+  - FakeMetricCollection:NDCG
+  - FakeMetricCollection:MRR
+  - FakeMetricCollection:BatchLength
+
+metrics:
+  - FakeMetricCollection:Precision
+  - FakeMetricCollection:Recall
+  - FakeMetricCollection:NDCG
+  - FakeMetricCollection:MRR
 
 log_params:
   on_epoch: True
-  on_step: True
-  #sync_dist: True #when logging on epoch level in distributed setting to accumulate the metric across devices; for raytune DDP
+  on_step: False
 
 /step_routing:
-  model_input_from_batch: ["in_sid", "out_sid"]
+  model_input_from_batch: [in_sid, out_sid]
   loss_input_from_model_output:
     input: null
   loss_input_from_batch:
@@ -45,43 +46,12 @@ log_params:
       relevance: relevance
     Recall:
       relevance: relevance
-    # F1:
-    #   relevance: relevance
-    MAP:
-      relevance: relevance
     NDCG:
       relevance: relevance
     MRR:
       relevance: relevance
-    PDD:
-      relevance: relevance
-    # RLS_Jaccard:
-    #   relevance: relevance
-    # RLS_RBO:
-    #   relevance: relevance
-    # RLS_FRBO:
-    #   relevance: relevance
   metrics_input_from_model_output:
-    Precision:
-      scores: null
-    Recall:
-      scores: null
-    # F1:
-    #   scores: null
-    MAP:
-      scores: null
-    NDCG:
-      scores: null
-    MRR:
-      scores: null
-    PDD:
-      scores: null
-    # RLS_Jaccard:
-    #   scores: null
-    # RLS_RBO:
-    #   scores: null
-    # RLS_FRBO:
-    #   scores: null
+    scores: null
 
 +loader_params: loader_params_cfg
 

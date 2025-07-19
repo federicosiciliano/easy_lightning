@@ -442,6 +442,9 @@ def split_rec_data(data: dict, split_method: str, split_keys: dict, test_sizes: 
         raise NotImplementedError
     return data
 
+def get_max_number_of(maps, key):
+    return np.max(list(maps[key].values()))
+
 
 if __name__ == '__main__':
     preprocess_dataset('gowalla')

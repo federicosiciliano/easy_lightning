@@ -621,7 +621,7 @@ def create_rec_model(name, seed=42, additional_module=None, **model_params):
         torch.nn.Module: Instance of the recommendation model.
     """
     # Set a random seed for weight initialization
-    pl.seed_everything(seed)
+    pl.seed_everything(seed, verbose=False)
     # Get the model from the model module
     if hasattr(additional_module, name):
         model_module = additional_module

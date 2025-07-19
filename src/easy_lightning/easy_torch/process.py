@@ -18,7 +18,7 @@ def create_model(main_module, seed=42, **kwargs):
     Returns:
         BaseNN: A PyTorch Lightning model wrapping the main_module.
     """
-    pl.seed_everything(seed) 
+    pl.seed_everything(seed, verbose=False) 
     # Create the model using the BaseNN class
     model = BaseNN(main_module, **kwargs)
     return model
@@ -44,7 +44,7 @@ def train_model(trainer, model, loaders, train_key="train", val_key="val", seed=
         None
     """
     # Set a random seed for deterministic training
-    pl.seed_everything(seed)
+    pl.seed_everything(seed, verbose=False)
 
     # Check if validation data loaders are specified and handle them accordingly
     # (single validation DataLoader if `val_key` is a string, or multiple if `val_key` is a list)
@@ -88,7 +88,7 @@ def validate_model(trainer, model, loaders, loaders_key="val", seed=42):
         None
 
     """
-    pl.seed_everything(seed, workers=True)
+    pl.seed_everything(seed, workers=True, verbose=False)
 
     # Validate the model using the trainer
     trainer.validate(model, loaders[loaders_key])
@@ -112,7 +112,7 @@ def test_model(trainer, model, loaders, test_key="test", tracker=None, profiler=
         None
     """
     # Set a random seed for reproducibility
-    pl.seed_everything(seed, workers=True)
+    pl.seed_everything(seed, workers=True, verbose=False)
 
     # Start the tracker and profiler if they are provided
     if tracker is not None: tracker.start()

@@ -97,7 +97,7 @@ def prepare_experiment_id(original_trainer_params, experiment_id, cfg=None):
 
 # Function to prepare callbacks
 def prepare_callbacks(trainer_params, additional_module=None, seed=42):
-    pl.seed_everything(seed) # Seed the random number generator
+    pl.seed_everything(seed, verbose=False) # Seed the random number generator
 
     # Initialize an empty list for callbacks
     callbacks = []
@@ -153,7 +153,7 @@ def remove_keys_from_dict(input_dict, keys_to_remove):
 
 # Function to prepare a logger based on trainer parameters
 def prepare_logger(trainer_params, additional_module=None, seed=42):
-    pl.seed_everything(seed) # Seed the random number generator
+    pl.seed_everything(seed, verbose=False) # Seed the random number generator
     logger = None
     if "logger" in trainer_params:
         # Get the logger class based on its name and initialize it with parameters
@@ -210,7 +210,7 @@ def prepare_plugins(trainer_params, additional_module=None):
 
 # Function to prepare a PyTorch Lightning Trainer instance
 def prepare_trainer(seed=42, raytune=False, **trainer_kwargs):
-    pl.seed_everything(seed) # Seed the random number generator
+    pl.seed_everything(seed, verbose=False) # Seed the random number generator
 
     # Default trainer parameters
     default_trainer_params = {"enable_checkpointing": False, "accelerator": "auto", "devices": "auto"}
@@ -228,7 +228,7 @@ def prepare_trainer(seed=42, raytune=False, **trainer_kwargs):
 
 # Function to prepare a loss function
 def prepare_loss(loss_info, *additional_modules, seed=42):
-    pl.seed_everything(seed) # Seed the random number generator
+    pl.seed_everything(seed, verbose=False) # Seed the random number generator
     if isinstance(loss_info, str):
         # If 'loss' is a string, assume it's the name of a loss function
         loss = get_single_loss(loss_info, {}, *additional_modules)
@@ -284,7 +284,7 @@ def prepare_metrics(metrics_info, *additional_modules, split_keys={"train":1,"va
                 else: 
                     raise NotImplementedError  # Raise an error for unsupported input types
                 
-                pl.seed_everything(seed) # Seed the random number generator
+                pl.seed_everything(seed, verbose=False) # Seed the random number generator
 
                 # Check if metric_name is the special FakeMetricCollectionMetric
                 metric_name, true_metric_name, metric_vals = handle_FakeMetricCollection(metric_name, metric_vals, *additional_modules)
@@ -308,13 +308,13 @@ def handle_FakeMetricCollection(metric_name, metric_params, *additional_modules)
     return metric_name, true_metric_name, metric_params
 
 def prepare_optimizer(name, params={}, seed=42):
-    pl.seed_everything(seed) # Seed the random number generator
+    pl.seed_everything(seed, verbose=False) # Seed the random number generator
     # Return a lambda function that creates an optimizer based on the provided name and parameters
     return lambda model_params: getattr(torch.optim, name)(model_params, **params)
 
 def prepare_model(model_cfg):
     # Seed the random number generator for weight initialization
-    pl.seed_everything(model_cfg["seed"]) # Seed the random number generator
+    pl.seed_everything(model_cfg["seed"], verbose=False) # Seed the random number generator
     
     # Create a model instance based on the provided configuration
     model = BaseNN(**model_cfg)
@@ -475,7 +475,7 @@ def complete_prepare_model(cfg, main_module, *additional_modules, model_params=N
 
 # Deprecated
 def prepare_profiler(trainer_params, additional_module=None, seed=42):
-    pl.seed_everything(seed) # Seed the random number generator
+    pl.seed_everything(seed, verbose=False) # Seed the random number generator
 
     # Check if "profiler" is in trainer_params
     if "profiler" in trainer_params:
