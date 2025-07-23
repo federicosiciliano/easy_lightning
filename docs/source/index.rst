@@ -30,3 +30,5 @@ Files
    modules
 
    config
+
+   easy_torch

@@ -14,3 +14,5 @@ easy_torch
    :maxdepth: 4
 
    model
+   process
+   utils
