@@ -8,11 +8,9 @@ easy_rec
 
 
 easy_torch
-========
+==========
 
 .. toctree::
    :maxdepth: 4
 
-   model
-   process
-   utils
+   easy_torch
