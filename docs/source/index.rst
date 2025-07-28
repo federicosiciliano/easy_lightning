@@ -21,8 +21,6 @@ EasyLightning is not limited to the specific datasets, models, or experimental s
 
 So far, we've developed EasyTorch and EasyRec. If you'd like to help us develop more modules or if you find any bugs, feel free to get in touch with us!
 
-Files
------
 
 .. toctree::
    :maxdepth: 2
@@ -31,7 +29,7 @@ Files
    Get_Started/installation
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: User Guide
 
    User_Guide/config
@@ -39,16 +37,15 @@ Files
    User_Guide/easy_torch_config
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Developer Guide
 
    Developer_Guide/custom_loss
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: API Reference
 
-   API_Reference/modules
-   API_Reference/sequential
+   API_Reference/easy_rec
    API_Reference/easy_torch
    

@@ -1,4 +1,4 @@
-easy\_torch package
+Easy\_Torch package
 ===================
 
 Submodules
@@ -64,14 +64,6 @@ easy\_torch.utils module
 ------------------------
 
 .. automodule:: easy_torch.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: easy_torch
    :members:
    :undoc-members:
    :show-inheritance:
