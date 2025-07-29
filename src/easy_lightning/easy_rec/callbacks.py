@@ -1,6 +1,16 @@
 import torch
 import pytorch_lightning as pl
 class DynamicNegatives(pl.callbacks.Callback):
+    """ 
+        PyTorch Lightning callback that dynamically updates a buffer of hard negatives 
+        for each user based on model predictions during training.
+    
+        Args:
+            dataloader (DataLoader): The training dataloader that will receive the updated negatives.
+            neg_key (str): The key used to access negatives in the batch.
+            id_key (str): The key used to access user IDs in the batch.
+            padding_idx (int): Index used for padding, ignored in negative selection.
+    """
     def __init__(self, dataloader, neg_key = "out_sid", id_key = "uid", padding_idx = 0):
         super().__init__()
         self.dataloader = dataloader
@@ -14,12 +24,27 @@ class DynamicNegatives(pl.callbacks.Callback):
         self.init_vars()
     
     def init_vars(self):
+        """
+            Initializes or resets internal tracking variables used to collect predictions and sampled negatives 
+            to prepare for the next epoch's data collection.
+        """
         self.id_keys = []
         self.sampled_negatives = []
         self.predictions_pos = []
         self.predictions_neg = []
         
     def on_train_batch_end(self, trainer, pl_module, model_outputs, batch_input, batch_idx):
+        """
+            Collects model predictions and sampled negatives at the end of each training batch.
+
+            Args:
+                trainer (Trainer): The PyTorch Lightning trainer.
+                pl_module (LightningModule): The model being trained.
+                model_outputs (dict): Output dictionary from the model's forward pass. Must include "model_output".
+                batch_input (dict): The batch data input to the model, typically from the dataloader.
+                batch_idx (int): Index of the current batch.
+            
+        """
         model_output = model_outputs['model_output']
         self.predictions_pos.append(model_output[:,:,:1])
         self.predictions_neg.append(model_output[:,:,1:])
@@ -27,6 +52,14 @@ class DynamicNegatives(pl.callbacks.Callback):
         self.id_keys.append(batch_input[self.id_key])
 
     def on_train_epoch_end(self, trainer, pl_module):
+        """
+            Processes accumulated predictions to identify hard negatives and update the negatives buffer at the end of each training epoch.
+
+            Args:
+                trainer (Trainer): The PyTorch Lightning trainer.
+                pl_module (LightningModule): The model being trained.
+        """
+        
         # Reshape of buffer and predictions
         self.sampled_negatives = torch.cat(self.sampled_negatives)
         self.predictions_neg = torch.cat(self.predictions_neg)

@@ -8,13 +8,12 @@ from . import model
 # Define a custom PyTorch Dataset class named DictDataset
 class DictDataset(torch.utils.data.Dataset):
     """
-    Custom PyTorch Dataset class that takes a dictionary as input and returns items based on keys.
+        Custom PyTorch Dataset class that takes a dictionary as input and returns items based on keys.
 
-    Args:
-        data (dict): Input dictionary containing data.
-
-    Returns:
-        dict: A dictionary where each key corresponds to a tensor item.
+        Args:
+            data (dict): Input dictionary containing data.
+        Returns:
+            dict: A dictionary where each key corresponds to a tensor item.
     """
     # Constructor to initialize the dataset with input data
     def __init__(self, data):
@@ -29,10 +28,24 @@ class DictDataset(torch.utils.data.Dataset):
 
     # Method to get an item from the dataset at a given index
     def __getitem__(self, index):
+        """
+            Retrieves a single item from the dataset at the given index.
+
+            Args:
+                index (int): Index of the item to retrieve.
+            Returns:
+                dict: Dictionary of the same keys as `data`, each containing the element at `index`.
+        """
+
         return {key: value[index] for key, value in self.data.items()}
 
     # Method to get the length of the dataset
     def __len__(self):
+        """
+            Returns the total number of samples in the dataset.
+            Returns:
+                int: Length of the dataset, inferred from the first key in the data dictionary.
+        """
         # Assumes that all values in the data dictionary have the same length
         return len(self.data[list(self.data.keys())[0]])
 
@@ -105,6 +118,21 @@ class DictDataset(torch.utils.data.Dataset):
 #TODO: which parent class to use?
 #TODO: move this into easy_torch
 class SequentialCollator:
+    """
+        A collator forfor preparing sequential input-output pairs with configurable lookback, lookforward, and simultaneous steps.
+        
+        Args:
+            sequential_keys (list): List of keys in the batch data that represent sequential features.
+            lookback (int): Number of time steps to look back for input sequences.
+            padding_value (int, optional): Value used for padding sequences. 
+            left_pad (bool, optional): Whether to pad sequences on the left. 
+            lookforward (int, optional): Number of time steps to skip between input and output. 
+            simultaneous_lookforward (int, optional): Number of simultaneous future time steps to predict. 
+            simultaneous_lookback (int, optional): Number of simultaneous past time steps to include in output. 
+            out_seq_len (int or float, optional): Length of output sequences. If float, treated as proportion of input length. 
+            keep_last (int, optional): Number of last time steps to keep in output. 
+            drop_original (bool, optional): Whether to remove original sequential keys from output. 
+    """
     def __init__(self,
                  sequential_keys,
                  lookback,
@@ -144,15 +172,47 @@ class SequentialCollator:
         
     #Functions needed because AttributeError: Can't pickle local object 'SequentialCollator.__init__.<locals>.<lambda>'
     def identity(self, x):
+        """
+            Returns input unchanged.
+
+            Args:
+                x: Input to return unchanged. 
+            Returns:
+                The input x unchanged.
+        """
         return x
     
     def reverse(self, x):
+        """
+            Reverses the order of elements in a sequence.
+
+            Args:
+                x: Input sequence to reverse. 
+            Returns:
+                Reversed sequence.
+        """
         return x[::-1]
     
     def flip(self, x):
+        """
+            Flips a PyTorch tensor along dimension 1.
+
+            Args:
+                x (torch.Tensor): Input tensor to flip.    
+            Returns:
+                torch.Tensor: Tensor flipped along dimension 1.
+        """
         return x.flip(dims=[1])
     
     def extra_pad(self, x):
+        """
+            Adds extra padding to ensure tensor meets minimum length requirements.
+
+            Args:
+                x (torch.Tensor): Input tensor to potentially pad.
+            Returns:
+                torch.Tensor: Padded tensor if padding was needed, otherwise original tensor.
+        """
         if self.needed_length <= x.shape[1]:
             return x
         else:
@@ -160,6 +220,15 @@ class SequentialCollator:
             #return torch.cat([x, self.padding_value*torch.ones((x.shape[0], self.needed_length - x.shape[1]),dtype=x.dtype)],dim=1)
 
     def __call__(self, batch):
+        """
+            Processes a batch of sequential data.
+
+            Args:
+                batch (list): List of dictionaries, each containing sequential data with keys
+                            specified in sequential_keys.         
+            Returns:
+                dict: Processed batch with input-output pairs created from sequential data.
+        """
         seq_lens = torch.tensor([len(x[self.sequential_keys[0]]) for x in batch])
 
         out = self.main_call(batch, seq_lens)
@@ -167,6 +236,14 @@ class SequentialCollator:
         return out
     
     def main_call(self, batch, seq_lens):
+        """
+            Main processing logic for handling the batch data.
+            Args:
+                batch (list): List of dictionaries containing the batch data.
+                seq_lens (torch.Tensor): Tensor containing the length of each sequence in the batch.
+            Returns:
+                dict: Processed batch data with padded sequences and input-output pairs.
+        """
         out = {}
         
         # Pad the sequences in the data using specified parameters
@@ -182,6 +259,14 @@ class SequentialCollator:
 
     # Method to pad a list of tensors and return the padded sequence as a tensor
     def pad_list_of_tensors(self, list_of_tensors):
+        """
+            Pads a list of tensors to create a uniform batch tensor.
+
+            Args:
+                list_of_tensors (list): List of tensors or sequences to be padded.
+            Returns:
+                torch.Tensor: Batched and padded tensor with shape (batch_size, padded_length).
+        """
         padded = torch.nn.utils.rnn.pad_sequence([torch.tensor(self.pad_x_function(x)) for x in list_of_tensors], batch_first=True, padding_value=self.padding_value)
         
         padded = self.extra_pad(padded)
@@ -203,6 +288,18 @@ class SequentialCollator:
     # Method to pair input and output sequences based on specified parameters
     # Now based on left_padding; TODO: reverse array if opposite
     def pair_input_output(self, data, seq_lens):
+        """
+            Creates input-output pairs from sequential data based on temporal relationships.
+
+            Args:
+                data (dict): Dictionary containing padded sequential data and other features.
+                seq_lens (torch.Tensor): Original sequence lengths before padding.
+            Returns:
+                dict: Updated data dictionary with 'in_{key}' and 'out_{key}' pairs for each
+                    sequential key. Original sequential keys are removed if drop_original is True.  
+            Raises:
+                ValueError: If computed current_index contains negative values.
+        """
         if self.out_seq_len is None:
             out_seq_len = seq_lens
         else:
@@ -269,12 +366,31 @@ class SequentialCollator:
         return data
     
 class SmartPaddingSequentialCollator(SequentialCollator):
+    """
+        A smart padding variant of SequentialCollator that dynamically adjusts lookback and the needed length based on batch content.
+    
+        Inherits all parameters from SequentialCollator.
+
+        Args:
+            needed_length_backup (int): Backup of the original needed_length value.
+            lookback_backup (int): Backup of the original lookback value.
+    """
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.needed_length_backup = self.needed_length
         self.lookback_backup = self.lookback
 
     def __call__(self, batch):
+        """
+            Processes a batch with smart padding that adapts lookback to available sequence length.
+            
+            Args:
+                batch (list): List of dictionaries, each containing sequential data with keys specified in sequential_keys.          
+            Returns:
+                dict: Processed batch with input-output pairs created from sequential data,
+                    using the optimally adjusted lookback window for this specific batch.
+        """
         seq_lens = torch.tensor([len(x[self.sequential_keys[0]]) for x in batch])
 
         # Set the lookback and needed length to the minimum of the current batch
@@ -288,7 +404,26 @@ class SmartPaddingSequentialCollator(SequentialCollator):
 
         return out
     
+
 class RecommendationSequentialCollator(SequentialCollator):
+    """
+        A specialized sequential collator for recommendation systems with negative sampling and relevance scoring.
+        
+        Args:
+            num_items (int): Total number of items in the recommendation catalog.
+            primary_key (str, optional): Key name for the main sequential feature (item IDs). 
+            relevance (str or None, optional): Relevance scoring strategy. Options: None, "fixed", "linear", "exponential", or a data key name. 
+            normalize_relevance (bool, optional): Whether to normalize relevance scores. 
+            num_positives (int, optional): Number of positive samples per timestep. 
+            num_negatives (int, optional): Number of negative samples per timestep. 
+            mask_value (int, optional): Value used for masking input items. If None and mask_prob > 0, defaults to num_items + 1.
+            mask_prob (float, optional): Probability of masking input items. 
+            negatives_relevance (float, optional): Relevance score assigned to negative samples. 
+            possible_negatives (str or callable, optional): Strategy for selecting candidate negatives. Options: "different", "all", "same", or custom function.
+            negatives_distribution (str or torch.Tensor, optional): Distribution for sampling negatives. Options: "uniform", "dynamic", or probability tensor.              
+            id_key (str, optional): Key name for user/session identifiers. 
+    """
+    
     def __init__(self,
                  num_items,
                  primary_key="sid",
@@ -360,6 +495,18 @@ class RecommendationSequentialCollator(SequentialCollator):
         self.mask_prob = mask_prob
 
     def __call__(self, batch):
+        """
+            Processes a batch for recommendation tasks with negative sampling and relevance scoring.
+
+            Args:
+                batch (list): List of dictionaries containing recommendation sequences with user/session data.    
+            Returns:
+                dict: Processed batch containing:
+                    - Input and output sequences (in_{primary_key}, out_{primary_key})
+                    - Relevance scores for all items (positive and negative)
+                    - Other features from the original batch
+                    - NaN relevance scores for padded positions
+        """
         out = super().__call__(batch)
 
         out["relevance"] = self.relevance_function(out).type(torch.float) # Add relevance scores to out #TODO: check type float
@@ -396,24 +543,74 @@ class RecommendationSequentialCollator(SequentialCollator):
         return out
     
     def different_possible_negatives(self, orig_seq, *args):
+        """
+            Gets candidate negative items that are different from items in the original sequence.
+            
+            Args:
+                orig_seq: Original sequence of item IDs.
+            Returns:
+                torch.Tensor: Tensor of item IDs that are not present in the original sequence.
+        """
         return torch.tensor(list(set(range(1, self.num_items + 1)).difference(orig_seq)))
 
     def all_possible_negatives(self, *args):
+        """
+            Gets all possible items as candidate negatives.
+
+            Returns:
+                torch.Tensor: Tensor containing all item IDs from 1 to num_items.
+        """
         return torch.arange(1, self.num_items + 1)
 
     def same_possible_negatives(self, orig_seq, *args): #sample only from orig_seq
+        """
+            Gets candidate negatives only from items present in the original sequence.
+            
+            Args:
+                orig_seq: Original sequence of item IDs. 
+            Returns:
+                torch.Tensor: Tensor of unique item IDs from the original sequence.
+        """
         return torch.tensor(list(set(orig_seq)))
 
     def uniform_negatives(self, possible_negatives, n, *args):
+        """
+            Samples negatives uniformly from candidate negatives.
+            
+            Args:
+                possible_negatives (torch.Tensor): Candidate negative item IDs.
+                n (int): Number of negatives to sample.
+            Returns:
+                torch.Tensor: Uniformly sampled negative item IDs.
+        """
         return possible_negatives[torch.randint(0, len(possible_negatives), (n,))]
     
     def distr_negatives(self, possible_negatives, n, *args):
+        """
+            Samples negatives according to a predefined probability distribution.
+            
+            Args:
+                possible_negatives (torch.Tensor): Candidate negative item IDs.
+                n (int): Number of negatives to sample.
+            Returns:
+                torch.Tensor: Negative item IDs sampled according to the distribution.
+        """
         distr = self.negatives_distribution[possible_negatives]
         repl = True if len(possible_negatives) < n else True
         return possible_negatives[torch.multinomial(distr, n, replacement=repl)]
 
     # Method to sample negative items for a given set of indices
     def sample_negatives(self, original_sequences, t=1, id_keys=[]):
+        """
+            Samples negative items for each sequence in the batch from candidates using the specified distribution.
+            
+            Args:
+                original_sequences (list): List of original item sequences for each user/session.
+                t (int, optional): Number of timesteps. Defaults to 1.
+                id_keys (list, optional): List of user/session identifiers. Defaults to empty list. 
+            Returns:
+                torch.Tensor: Tensor of shape (batch_size, t, max(num_negatives, 1)) containing negative item IDs for each sequence and timestep.
+        """
         id_keys = id_keys if len(id_keys)>0 else [None]*len(original_sequences)
         if self.num_negatives == 0:
             return torch.zeros(len(original_sequences), t, self.num_negatives, dtype=torch.long)
@@ -428,6 +625,14 @@ class RecommendationSequentialCollator(SequentialCollator):
         return negatives
     
     def mask_input(self, input):
+        """
+            Applies random mask to items of input sequencesn for evaluation purposes.
+            
+            Args:
+                input (torch.Tensor): Input tensor of item IDs to potentially mask.
+            Returns:
+                torch.Tensor: Input tensor with some items replaced by mask_value.
+        """
         if self.mask_prob == 0: return input
         mask = torch.rand(input.shape) < self.mask_prob
         if self.out_seq_len is not None:
@@ -440,6 +645,17 @@ class RecommendationSequentialCollator(SequentialCollator):
 
     # Function to generate a relevance tensor based on the specified relevance type and shape
     def generate_relevance_from_type(self, complete_data):
+        """
+            Generates relevance scores based on the specified relevance type:
+                - None/"fixed": All items have relevance score of 1.0
+                - "linear": Linear decay from 1.0 to 0.0 over sequence positions
+                - "exponential": Exponential decay over sequence positions
+
+            Args:
+                complete_data (dict): Complete batch data containing output sequences.
+            Returns:
+                torch.Tensor: Relevance scores tensor matching the shape of output sequences, with values between 0 and 1, optionally normalized.
+        """
         relevance_type = self.relevance
         data = complete_data[self.out_key]
         shape = data.shape
@@ -465,12 +681,22 @@ class RecommendationSequentialCollator(SequentialCollator):
         return app
     
     def get_relevance_from_data(self, complete_data):
+        """
+            Extracts relevance scores from an existing data field.
+            
+            Args:
+                complete_data (dict): Complete batch data containing the relevance field.
+            Returns:
+                torch.Tensor: Relevance scores extracted from the specified data key.
+        """
         return complete_data[self.relevance]
+
 
 class RecommendationSmartPaddingSequentialCollator(
         RecommendationSequentialCollator, SmartPaddingSequentialCollator
     ):
     pass
+    
     
 def prepare_rec_datasets(data,
                          split_keys={"train": ["sid", "timestamp", "rating", "uid"],
@@ -479,15 +705,14 @@ def prepare_rec_datasets(data,
                          **dataset_params
                          ):
     """
-    Prepare recommendation datasets for training and evaluation.
+        Prepare recommendation datasets for training and evaluation.
 
-    Args:
-        data (dict): Input dictionary containing data.
-        split_keys (dict): Dictionary specifying keys for different splits.
-        **dataset_params: Additional parameters for dataset preparation.
-
-    Returns:
-        dict: Dictionary containing prepared recommendation datasets for each split.
+        Args:
+            data (dict): Input dictionary containing data.
+            split_keys (dict): Dictionary specifying keys for different splits.
+            **dataset_params: Additional parameters for dataset preparation.
+        Returns:
+            dict: Dictionary containing prepared recommendation datasets for each split.
     """
 
     datasets = {}
@@ -516,16 +741,15 @@ def prepare_rec_collators(split_keys = ["train", "val", "test"],
                          collator_class = RecommendationSequentialCollator,
                          **collator_params):
     """
-    Prepare recommendation data collators for training and evaluation.
+        Prepare recommendation data collators for training and evaluation.
 
-    Args:
-        data (dict): Input dictionary containing data.
-        split_keys (list): List of split keys for data collators.
-        original_seq_key (str): Key for original sequences in the data.
-        **collator_params: Additional parameters for data collator preparation.
-
-    Returns:
-        dict: Dictionary containing prepared recommendation data collators for each split.
+        Args:
+            data (dict): Input dictionary containing data.
+            split_keys (list): List of split keys for data collators.
+            original_seq_key (str): Key for original sequences in the data.
+            **collator_params: Additional parameters for data collator preparation.
+        Returns:
+            dict: Dictionary containing prepared recommendation data collators for each split.
     """
 
     # Default collator parameters
@@ -554,6 +778,16 @@ def prepare_rec_collators(split_keys = ["train", "val", "test"],
     return collators
 
 def change_num_negative_if_float(collator_params):
+    """
+        Converts the 'num_negatives' parameter from a float to an integer count if necessary.
+
+        Args:
+            collator_params (dict): Dictionary of parameters for a data collator. Must contain `"num_items"` if `"num_negatives"` is a float.
+        Returns:
+            dict: The modified `collator_params` dictionary with `"num_negatives"` as an integer if it was originally a float.
+        Raises:
+            KeyError: If `"num_negatives"` is a float and `"num_items"` is not provided in `collator_params`.
+    """
     if "num_negatives" in collator_params:
         if isinstance(collator_params["num_negatives"], float):
             collator_params["num_negatives"] = int(collator_params["num_negatives"]*collator_params["num_items"])
@@ -568,17 +802,16 @@ def prepare_rec_data_loaders(datasets,
                              original_seq_key="sid",
                              **loader_params):
     """
-    Prepare recommendation data loaders for training and evaluation.
+        Prepare recommendation data loaders for training and evaluation.
 
-    Args:
-        datasets (dict): Dictionary containing prepared recommendation datasets.
-        data (dict): Input dictionary containing data.
-        split_keys (list): List of split keys for data loaders.
-        original_seq_key (str): Key for original sequences in the data.
-        **loader_params: Additional parameters for data loader preparation.
-
-    Returns:
-        dict: Dictionary containing prepared recommendation data loaders for each split.
+        Args:
+            datasets (dict): Dictionary containing prepared recommendation datasets.
+            data (dict): Input dictionary containing data.
+            split_keys (list): List of split keys for data loaders.
+            original_seq_key (str): Key for original sequences in the data.
+            **loader_params: Additional parameters for data loader preparation.
+        Returns:
+            dict: Dictionary containing prepared recommendation data loaders for each split.
     """                         
     # TODO: dict instead of list
     # I don't remember what I meant by this comment
@@ -610,15 +843,14 @@ def prepare_rec_data_loaders(datasets,
 
 def create_rec_model(name, seed=42, additional_module=None, **model_params):
     """
-    Create a recommendation model.
-
-    Args:
-        name (str): Name of the recommendation model.
-        seed (int): Random seed for weight initialization.
-        **model_params: Additional parameters for model creation.
-
-    Returns:
-        torch.nn.Module: Instance of the recommendation model.
+        Create a recommendation model.
+        
+        Args:
+            name (str): Name of the recommendation model.
+            seed (int): Random seed for weight initialization.
+            **model_params: Additional parameters for model creation.
+        Returns:
+            torch.nn.Module: Instance of the recommendation model.
     """
     # Set a random seed for weight initialization
     pl.seed_everything(seed, verbose=False)
