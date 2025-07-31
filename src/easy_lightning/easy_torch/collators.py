@@ -1,6 +1,21 @@
 import torch
 #TODO: which parent class to use?
 class SequentialCollator:
+    """
+        A collator for preparing sequential input-output pairs with configurable lookback, lookforward, and simultaneous steps.
+        
+        Args:
+            sequential_keys (list): List of keys in the batch data that represent sequential features.
+            lookback (int): Number of time steps to look back for input sequences.
+            padding_value (int, optional): Value used for padding sequences. 
+            left_pad (bool, optional): Whether to pad sequences on the left. 
+            lookforward (int, optional): Number of time steps to skip between input and output. 
+            simultaneous_lookforward (int, optional): Number of simultaneous future time steps to predict. 
+            simultaneous_lookback (int, optional): Number of simultaneous past time steps to include in output. 
+            out_seq_len (int or float, optional): Length of output sequences. If float, treated as proportion of input length. 
+            keep_last (int, optional): Number of last time steps to keep in output. 
+            drop_original (bool, optional): Whether to remove original sequential keys from output. 
+    """
     def __init__(self,
                  sequential_keys,
                  lookback,

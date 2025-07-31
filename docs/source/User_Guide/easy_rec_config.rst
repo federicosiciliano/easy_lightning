@@ -1,4 +1,4 @@
-easy_rec config
+Easy_Rec Config
 ===============
 
 Dataset parameters 

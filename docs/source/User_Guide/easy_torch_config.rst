@@ -1,4 +1,4 @@
-easy_torch config
+Easy_Torch Config
 =================
 
 Data Parameters

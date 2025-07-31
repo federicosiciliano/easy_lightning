@@ -3,6 +3,20 @@ from copy import deepcopy
 import numpy as np
 
 def prepare_rec_data(cfg, data_params=None):
+    """
+        Prepares recommendation data for training, validation, and testing.
+
+        Args:
+            cfg (dict): Configuration dictionary containing at least a `"data_params"` key
+                        with all parameters needed for dataset preprocessing.
+            data_params (dict, optional): Override dictionary for data parameters.
+                                        If None, `cfg["data_params"]` is deep-copied and used.
+
+        Returns:
+            tuple:
+                - data (dict): Dictionary containing split data (e.g., train/valid/test sequences).
+                - maps (dict): Dictionary with mapping info (e.g., original to dense user/item IDs).
+    """
     if data_params is None:
         data_params = deepcopy(cfg["data_params"])
 
@@ -10,7 +24,25 @@ def prepare_rec_data(cfg, data_params=None):
 
     return data, maps
 
+
 def prepare_rec_dataloaders(cfg, data, maps=None, data_params=None, collator_params=None, loader_params=None):
+    """
+        Prepares PyTorch DataLoaders for recommendation tasks based on the provided configuration and data.
+
+        Args:
+            cfg (dict): Configuration dictionary.
+            data (dict): Preprocessed data dictionary (typically the output of `prepare_rec_data`),
+                        containing train/validation/test user interaction sequences.
+            maps (dict, optional): Mapping dictionary for user and item IDs.
+            data_params (dict, optional): Override dictionary for data-related parameters.
+                                        If not provided, `cfg["data_params"]` is used.
+            collator_params (dict, optional): Parameters for constructing data collators
+                                            (e.g., padding, negative sampling settings).
+            loader_params (dict, optional): Parameters for the DataLoader (e.g., batch size, shuffle).
+
+        Returns:
+            dict: A dictionary of PyTorch DataLoaders.
+    """
     if data_params is None:
         data_params = deepcopy(cfg["data_params"])
 
@@ -32,6 +64,26 @@ def prepare_rec_dataloaders(cfg, data, maps=None, data_params=None, collator_par
 
 
 def prepare_rec_model(cfg, maps=None, data_params=None, rec_model_params=None):
+    """
+        Prepares and instantiates a recommendation model using the given configuration.
+
+        Args:
+            cfg (dict): Configuration dictionary. 
+            maps (dict, optional): Dictionary containing ID mappings for users (`"uid"`) and
+                                items (`"sid"`).
+            data_params (dict, optional): Override dictionary for data parameters.
+                                        If None, `cfg["data_params"]` is used.
+            rec_model_params (dict, optional): Parameters used to build the model.
+                                            If None, `cfg["model"]["rec_model"]` is used.
+
+        Returns:
+            torch.nn.Module: Instantiated recommendation model ready for training.
+
+        Raises:
+            ValueError: If `maps` is not provided and required keys (`num_items`, `num_users`)
+                        are missing in `rec_model_params`.
+    """
+       
     if data_params is None:
         data_params = deepcopy(cfg["data_params"])
     

@@ -3,13 +3,12 @@ import torch
 # Define a custom PyTorch Dataset class named DictDataset
 class DictDataset(torch.utils.data.Dataset):
     """
-    Custom PyTorch Dataset class that takes a dictionary as input and returns items based on keys.
+        Custom PyTorch Dataset class that takes a dictionary as input and returns items based on keys.
 
-    Args:
-        data (dict): Input dictionary containing data.
-
-    Returns:
-        dict: A dictionary where each key corresponds to a tensor item.
+        Args:
+            data (dict): Input dictionary containing data.
+        Returns:
+            dict: A dictionary where each key corresponds to a tensor item.
     """
     # Constructor to initialize the dataset with input data
     def __init__(self, data):

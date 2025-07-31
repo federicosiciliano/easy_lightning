@@ -48,7 +48,8 @@ def download_dataset(dataset_name: str, dataset_raw_folder: str, additional_file
         elif 'amazon' in dataset_name.lower():
             # Amazon review datasets
             if not os.path.exists(os.path.join(dataset_raw_folder, additional_file_name)):
-                url = f"https://mcauleylab.ucsd.edu/public_datasets/data/amazon_v2/categoryFiles/{additional_file_name}.json.gz"
+                os.makedirs(dataset_raw_folder, exist_ok=True)
+                url = f"https://mcauleylab.ucsd.edu/public_datasets/data/amazon_v2/categoryFiles/{additional_file_name}.gz"
                 output_path = os.path.join(dataset_raw_folder, f"{additional_file_name.split('.')[0]}.json.gz")
                 subprocess.run(["curl", "-k", "-o", output_path, url], check=True)
                 subprocess.run(["gzip", "-d", output_path], check=True)
@@ -440,6 +441,9 @@ def split_rec_data(data: dict, split_method: str, split_keys: dict, test_sizes: 
     else:
         raise NotImplementedError
     return data
+
+def get_max_number_of(maps, key):
+    return np.max(list(maps[key].values()))
 
 
 if __name__ == '__main__':

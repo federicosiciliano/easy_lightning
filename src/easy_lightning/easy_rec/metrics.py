@@ -3,6 +3,27 @@ import torchmetrics
 
 
 def prepare_rank_corrections(metrics_info, num_negatives = None, num_items = None, put_uncorrected = True, split_keys={"train":1,"val":2,"test":1}):
+    """
+        Prepares a structured metrics configuration with rank correction functions for recommendation evaluation metrics.
+
+        Args:
+            metrics_info (dict or list): Configuration for metrics to compute.
+            num_negatives (int, dict, optional): Number of negative samples used during evaluation.
+            num_items (int, dict, optional): Total number of items in the catalog.
+            put_uncorrected (bool, dict, optional): Whether to include uncorrected metrics.
+            split_keys (dict, optional): Configuration of data splits and number of dataloaders per split. Format: {split_name: num_dataloaders}. 
+        Returns:
+            dict: Nested dictionary, where:
+                - Outer keys are split names (e.g., "train", "val", "test").
+                - Each value is a list of dictionaries, one per dataloader.
+                - Each metric can include a `rank_corrections` dictionary containing:
+                    * `""`: identity function (no correction)
+                    * `"corrected"`: correction function that multiplies scores by `num_items / num_negatives`
+                
+        Raises:
+            NotImplementedError: If metrics_info is neither a list nor a dict. 
+    
+    """
     metrics = {}
 
     # This part could be improved by using a function
@@ -72,11 +93,13 @@ def prepare_rank_corrections(metrics_info, num_negatives = None, num_items = Non
 
 class RecMetric(torchmetrics.Metric):
     """
-        Initializes the RecMetric.
+        Base class for recommendation system metrics with support for top-k evaluation and rank corrections
 
         Args:
             top_k (list): List of integers representing top-k values for evaluation.
             batch_metric (bool): Whether to compute metrics on batch level or not.
+            rank_corrections (dict, optional): Dictionary mapping correction names to correction functions.
+
     """
     def __init__(self, top_k = [5,10,20], batch_metric = False, rank_corrections = {"": lambda x: x}):
         super().__init__()
@@ -104,10 +127,10 @@ class RecMetric(torchmetrics.Metric):
 
     def compute(self):
         """
-        Computes and returns the metric values.
+            Computes and returns the metric values.
 
-        Returns:
-            dict: Dictionary containing metric values.
+            Returns:
+                dict: Dictionary containing metric values for each combination of top-k and rank correction.
         """
         # Compute accuracy as the ratio of correct predictions to total examples
         out = {}
@@ -123,10 +146,10 @@ class RecMetric(torchmetrics.Metric):
     
     def not_nan_subset(self, **kwargs):
         """
-        Subsets input tensors where the 'relevance' tensor is not NaN.
+            Subsets input tensors where the 'relevance' tensor is not NaN.
 
-        Returns:
-            dict: Subset of input tensors where 'relevance' is not NaN.
+            Returns:
+                dict: Subset of input tensors where 'relevance' is not NaN.
         """
         if "relevance" in kwargs:
             # Subset other args, kwargs where relevance is not nan
@@ -140,21 +163,26 @@ class RecMetric(torchmetrics.Metric):
         return kwargs
     
 class RLS_Jaccard(RecMetric):
-    '''
-     ...
-    '''
+    """
+        Jaccard similarity-based metric for evaluating the overlap between the top-k items of two ranked score tensors.
+        This metric is used in recommendation systems to assess how much agreement there is between two sets of rankings, at different top-k thresholds.
+
+        Args:
+            rbo_p (float): A persistence parameter.
+            args: Positional arguments passed to the base RecMetric.
+    """ 
     def __init__(self, rbo_p=0.9, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.rbo_p = rbo_p
 
     def update(self, scores: torch.Tensor, other_scores: torch.Tensor, relevance: torch.Tensor):
         """
-        Updates the metric values based on the input scores and relevance tensors.
+            Updates the metric values based on the input scores and relevance tensors.
 
-        Args:
-            scores (torch.Tensor): Tensor containing prediction scores.
-            other_scores (torch.Tensor): Tensor containing other prediction scores.
-            relevance (torch.Tensor): Tensor containing relevance values.
+            Args:
+                scores (torch.Tensor): Tensor containing prediction scores.
+                other_scores (torch.Tensor): Tensor containing other prediction scores to compare against.
+                relevance (torch.Tensor): Tensor containing relevance values.
         """
 
         # Call not_nan_subset to subset scores, relevance where relevance is not nan
@@ -184,18 +212,26 @@ class RLS_Jaccard(RecMetric):
             self.total += relevance.shape[0]
 
 class RLS_RBO(RecMetric):
+    """
+        Computes the Ranked List Similarity (RBO) between two ranked score tensors, placing greater weight
+        on agreement at higher ranks. 
+
+        Args:
+            rbo_p (float): Persistence parameter controlling the top-heaviness of the RBO computation.
+                        Must be in the range (0, 1). Higher values emphasize agreement at higher ranks.
+    """ 
     def __init__(self, rbo_p=0.9, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.rbo_p = rbo_p
 
     def update(self, scores: torch.Tensor, other_scores: torch.Tensor, relevance: torch.Tensor):
         """
-        Updates the metric values based on the input scores and relevance tensors.
+            Updates the metric values based on the input scores and relevance tensors.
 
-        Args:
-            scores (torch.Tensor): Tensor containing prediction scores.
-            other_scores (torch.Tensor): Tensor containing other prediction scores.
-            relevance (torch.Tensor): Tensor containing relevance values.
+            Args:
+                scores (torch.Tensor): Tensor containing prediction scores.
+                other_scores (torch.Tensor): Tensor containing other prediction scores to compare against.
+                relevance (torch.Tensor): Tensor containing relevance values.
         """
 
         # Call not_nan_subset to subset scores, relevance where relevance is not nan
@@ -228,21 +264,27 @@ class RLS_RBO(RecMetric):
             self.total += relevance.shape[0]
 
 class RLS_FRBO(RecMetric):
-    '''
-     ...
-    '''
+    """
+        Computes the Finite Ranked Biased Overlap (FRBO) between two ranked lists of scores.
+        FRBO is a normalized variant of Ranked Biased Overlap (RBO) that limits computation to a finite depth `top_k`,
+        making it more appropriate for practical use cases where only the top portion of rankings matters.
+
+        Args:
+            rbo_p (float): Persistence parameter controlling the top-heaviness of the FRBO computation.
+                        Must be in the range (0, 1). Higher values emphasize agreement at higher ranks.
+    """
     def __init__(self, rbo_p=0.9, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.rbo_p = rbo_p
 
     def update(self, scores: torch.Tensor,  other_scores: torch.Tensor, relevance: torch.Tensor):
         """
-        Updates the metric values based on the input scores and relevance tensors.
+            Updates the metric values based on the input scores and relevance tensors.
 
-        Args:
-            scores (torch.Tensor): Tensor containing prediction scores.
-            other_scores (torch.Tensor): Tensor containing other prediction scores.
-            relevance (torch.Tensor): Tensor containing relevance values.
+            Args:
+                scores (torch.Tensor): Tensor containing prediction scores.
+                other_scores (torch.Tensor): Tensor containing other prediction scores to compare against.
+                relevance (torch.Tensor): Tensor containing relevance values.
         """
 
         # Call not_nan_subset to subset scores, relevance where relevance is not nan
@@ -376,6 +418,13 @@ class MRR(RecMetric):
         super().__init__(*args, **kwargs)
 
     def update(self, scores: torch.Tensor, relevance: torch.Tensor):
+        """
+            Updates the metric values based on the input scores and relevance tensors.
+
+            Args:
+                scores (torch.Tensor): Tensor containing prediction scores.
+                relevance (torch.Tensor): Tensor containing relevance values.
+        """
         # Call not_nan_subset to subset scores, relevance where relevance is not nan
         kwargs = self.not_nan_subset(scores=scores, relevance=relevance)
         scores, relevance = kwargs["scores"], kwargs["relevance"]
@@ -442,6 +491,13 @@ class Recall(RecMetric):
         super().__init__(*args, **kwargs)
 
     def update(self, scores: torch.Tensor, relevance: torch.Tensor):
+        """
+            Updates the metric values based on the input scores and relevance tensors.
+
+            Args:
+                scores (torch.Tensor): Tensor containing prediction scores.
+                relevance (torch.Tensor): Tensor containing relevance values.
+        """
         # Call not_nan_subset to subset scores, relevance where relevance is not nan
         kwargs = self.not_nan_subset(scores=scores, relevance=relevance)
         scores, relevance = kwargs["scores"], kwargs["relevance"]
@@ -466,16 +522,23 @@ class Recall(RecMetric):
             self.total += relevance.shape[0]
 
 class F1(RecMetric):
-    '''
-    The F1 score is the harmonic mean of precision and recall. 
-    It is a single metric that combines both precision and recall to provide a single measure of the quality of a ranking system.
-    '''
+    """
+        The F1 score is the harmonic mean of precision and recall. 
+        It is a single metric that combines both precision and recall to provide a single measure of the quality of a ranking system.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.precision = Precision(*args, **kwargs)
         self.recall = Recall(*args, **kwargs)
 
     def update(self, scores: torch.Tensor, relevance: torch.Tensor):
+        """
+            Updates internal Precision and Recall metrics based on the input scores and relevance.
+
+            Args:
+                scores (torch.Tensor): Tensor containing prediction scores.
+                relevance (torch.Tensor): Tensor containing relevance values.
+        """
         self.precision.update(scores, relevance)
         self.recall.update(scores, relevance)
 
@@ -489,14 +552,21 @@ class F1(RecMetric):
         return out
 
 class PrecisionWithRelevance(RecMetric):
-    '''
-    It computes the proportion of accurately identified relevant items among all the items recommended within a list of length K.
-    It is used to explicitly count the number of recommended, or retrieved, items that are truly relevant.
-    '''
+    """
+        It computes the proportion of accurately identified relevant items among all the items recommended within a list of length K.
+        It is used to explicitly count the number of recommended, or retrieved, items that are truly relevant.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def update(self, scores: torch.Tensor, relevance: torch.Tensor):
+        """
+            Updates the internal metric state using the provided prediction scores and relevance labels.
+
+            Args:
+                scores (torch.Tensor): Tensor containing prediction scores.
+                relevance (torch.Tensor): Tensor containing relevance values.
+        """
         # Call not_nan_subset to subset scores, relevance where relevance is not nan
         kwargs = self.not_nan_subset(scores=scores, relevance=relevance)
         scores, relevance = kwargs["scores"], kwargs["relevance"]
@@ -519,18 +589,24 @@ class PrecisionWithRelevance(RecMetric):
             self.total = self.total + relevance.shape[0] #not using += cause getting InferenceMode error sometimes
 
 class MAP(RecMetric):
-    '''
-    Mean Average Precision (MAP) evaluates the efficacy of a ranking system by considering the average precision across the top R recommendations for R ranging from 1 to K. 
-    It emphasizes that precision values for items within the top K positions contribute to the overall assessment also accounting for the significance of the order in the ranking. 
-    Different from NDCG, this metric does not explicitly assign a different importance to different slots.
-    
-    '''
+    """
+        Mean Average Precision (MAP) evaluates the efficacy of a ranking system by considering the average precision across the top R recommendations for R ranging from 1 to K. 
+        It emphasizes that precision values for items within the top K positions contribute to the overall assessment also accounting for the significance of the order in the ranking. 
+        Different from NDCG, this metric does not explicitly assign a different importance to different slots.
+    """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.precision_at_k = PrecisionWithRelevance(list(range(1,torch.max(torch.tensor(self.top_k))+1)), self.batch_metric, self.rank_corrections)
 
     def update(self, scores: torch.Tensor, relevance: torch.Tensor):
+        """
+            Updates the internal precision metrics needed to compute MAP.
+
+             Args:
+                scores (torch.Tensor): Tensor containing prediction scores.
+                relevance (torch.Tensor): Tensor containing relevance values.
+        """
         self.precision_at_k.update(scores, relevance)
 
     def compute(self):
@@ -554,5 +630,8 @@ class MAP(RecMetric):
         return super().compute()
     
     def reset(self):
+        """
+            Resets all internal states of the MAP metric and its dependent precision tracker.
+        """
         super().reset()
         self.precision_at_k.reset()
