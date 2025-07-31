@@ -19,6 +19,9 @@ def download_dataset(dataset_name: str, dataset_raw_folder: str, additional_file
         dataset_name (str): Name of the dataset to download.
         dataset_raw_folder (str): Folder path to save the downloaded dataset.
         additional_file_name (str, optional): Additional file name required for some datasets.
+
+    Returns:
+        None
     """
     print(f"Downloading dataset {dataset_name} to {dataset_raw_folder}...")
 
@@ -46,7 +49,8 @@ def download_dataset(dataset_name: str, dataset_raw_folder: str, additional_file
         elif 'amazon' in dataset_name.lower():
             # Amazon review datasets
             if not os.path.exists(os.path.join(dataset_raw_folder, additional_file_name)):
-                url = f"https://mcauleylab.ucsd.edu/public_datasets/data/amazon_v2/categoryFiles/{additional_file_name}.json.gz"
+                os.makedirs(dataset_raw_folder, exist_ok=True)
+                url = f"https://mcauleylab.ucsd.edu/public_datasets/data/amazon_v2/categoryFiles/{additional_file_name}.gz"
                 output_path = os.path.join(dataset_raw_folder, f"{additional_file_name.split('.')[0]}.json.gz")
                 subprocess.run(["curl", "-k", "-o", output_path, url], check=True)
                 subprocess.run(["gzip", "-d", output_path], check=True)
@@ -116,7 +120,7 @@ def preprocess_dataset(
         min_rating (float, optional): Minimum rating to retain.
         min_items_per_user (int): Min number of items per user.
         min_users_per_item (int): Min number of users per item.
-        densify_index (bool): Whether to remap user/item IDs to 1-based dense indices.
+        densify_index (bool): Whether to remap user/item IDs to 0-based dense indices.
         split_method (str): Data split strategy (e.g., "leave_n_out").
         split_keys (Dict): Keys to split and their resulting keys.
         test_sizes (List[int]): Size of test/validation split.
@@ -165,6 +169,9 @@ def maybe_preprocess_raw_dataset(dataset_raw_folder: str, dataset_name: str) -> 
     Args:
         dataset_raw_folder (str): Path to the raw dataset folder.
         dataset_name (str): Name of the dataset.
+
+    Returns:
+        None
     """
     if any(Path(dataset_raw_folder).glob('*.csv')):
         return
@@ -362,17 +369,6 @@ def load_ratings_df(dataset_raw_folder: str, dataset_name: str) -> pd.DataFrame:
 
 
 def filter_ratings(df: pd.DataFrame, min_rating: float) -> pd.DataFrame:
-    """
-    Filters the DataFrame to retain only ratings above the specified minimum threshold.
-    
-    Args:
-        df (pd.DataFrame): Input DataFrame containing ratings data.
-        min_rating (float): Minimum rating threshold. If None, no filtering is applied.
-    
-    Returns:
-        pd.DataFrame: Filtered DataFrame with ratings >= min_rating.
-    """
-
     if min_rating is not None:
         print(f"Filtering the items with score < {min_rating}.")
         df = df[df['rating'] >= min_rating]
@@ -380,19 +376,6 @@ def filter_ratings(df: pd.DataFrame, min_rating: float) -> pd.DataFrame:
 
 
 def filter_by_frequence(df: pd.DataFrame, min_items_per_user: int, min_users_per_item: int) -> pd.DataFrame:
-    """
-    Filters the DataFrame based on interaction frequency thresholds to
-    sparse data points that might not be useful for training recommender systems.
-    
-    Args:
-        df (pd.DataFrame): Input DataFrame with user-item interactions.
-        min_items_per_user (int): Minimum number of items a user must have interacted with.
-        min_users_per_item (int): Minimum number of users an item must have interactions from.
-    
-    Returns:
-        pd.DataFrame: Filtered DataFrame meeting the frequency requirements.
-    """
-
     if min_users_per_item > 0:
         print(f'-------- Filtering by minimum number of users per item: {min_users_per_item} --------')
         item_sizes = df.groupby('sid').size()
@@ -409,18 +392,6 @@ def filter_by_frequence(df: pd.DataFrame, min_items_per_user: int, min_users_per
 
 
 def densify_index_method(df: pd.DataFrame, vars=["uid", "sid"]):
-    """
-    Remaps user and item IDs to dense, consecutive integer indices starting from 1.
-    
-    Args:
-        df (pd.DataFrame): Input DataFrame containing user and item columns.
-        vars (List[str], optional): Column names to densify. 
-    
-    Returns:
-        Tuple[pd.DataFrame, Dict]: 
-            - DataFrame with densified indices
-            - Dictionary mapping original IDs to new dense indices for each variable
-    """
     print('-------- Densifying index --------')
     maps = {}
     for var_name in tqdm(vars):
@@ -430,20 +401,6 @@ def densify_index_method(df: pd.DataFrame, vars=["uid", "sid"]):
 
 
 def df_to_sequences(df: pd.DataFrame, keep_vars=["uid"], seq_vars=["sid", "rating", "timestamp"], user_var="uid", time_var="timestamp") -> dict:
-    """
-    Converts user-item interaction DataFrame into sequence format for each user based on timestamps.
-    
-    Args:
-        df (pd.DataFrame): Input DataFrame with user-item interactions.
-        keep_vars (List[str], optional): Variables to keep as single values per user. 
-        seq_vars (List[str], optional): Variables to convert to sequences.
-        user_var (str, optional): Column name for user identifier. 
-        time_var (str, optional): Column name for timestamp to order sequences. 
-    
-    Returns:
-        Dict: Dictionary where keys are variable names and values are arrays of sequences/values per user.
-    """
-
     df_group_by_user = df.groupby(user_var)
     data = {}
     for var in seq_vars:
@@ -454,15 +411,6 @@ def df_to_sequences(df: pd.DataFrame, keep_vars=["uid"], seq_vars=["sid", "ratin
 
 
 def print_stats(complete_set: dict, keep_time: bool):
-    """
-    Prints statistics about the dataset sequences, including number of users, items, average sequence length,
-    and total interactions.
-    
-    Args:
-        complete_set (Dict): Dictionary containing user sequences, either as simple sequences
-                           or tuples of (sequence, timestamps) if keep_time is True.
-        keep_time (bool): Whether the sequences include timestamp information as tuples.
-    """
     print(f"-------- Number of users: {len(complete_set)} --------")
     if keep_time:
         items = [seq for u, (seq, _) in complete_set.items()]
@@ -478,22 +426,6 @@ def print_stats(complete_set: dict, keep_time: bool):
 
 
 def split_rec_data(data: dict, split_method: str, split_keys: dict, test_sizes: list, **kwargs) -> dict:
-    """
-    Splits sequential recommendation data into train/validation/test sets according to a split method.
-    
-    Args:
-        data (Dict): Dictionary containing user sequences to split.
-        split_method (str): Method for splitting data. Currently supports "leave_n_out".
-        split_keys (Dict): Mapping of original keys to new split keys (e.g., {"sid": ["train_sid", "val_sid", "test_sid"]}).
-        test_sizes (List[int]): Number of items to reserve for each split (from end of sequence).
-        **kwargs: Additional arguments including 'del_after_split' to remove original keys.
-    
-    Returns:
-        Dict: Data dictionary with new split keys added and optionally original keys removed.
-    
-    Raises:
-        NotImplementedError: If split_method is not "leave_n_out".
-    """
     print(f'-------- Splitting use {split_method} --------')
     if split_method == 'leave_n_out':
         for orig_key, new_keys in split_keys.items():
@@ -512,16 +444,6 @@ def split_rec_data(data: dict, split_method: str, split_keys: dict, test_sizes: 
     return data
 
 def get_max_number_of(maps, key):
-    """
-    Returns the maximum value from the mapping dictionary for a given key.
-    
-    Args:
-        maps (Dict): Dictionary containing mappings, typically from densify_index_method.
-        key (str): Key to look up in the maps dictionary (e.g., "uid" or "sid").
-    
-    Returns:
-        int: Maximum value in the mapping for the specified key.
-    """
     return np.max(list(maps[key].values()))
 
 
