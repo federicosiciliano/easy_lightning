@@ -27,7 +27,7 @@ metrics:
     metric_class: NDCG
   # - RLS_Jaccard
   # - RLS_RBO
-  # - RLS_FRBO 
+  # - RLS_FRBO
 
 log_params:
   on_epoch: True
