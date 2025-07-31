@@ -89,7 +89,7 @@ def separate_rows_and_columns(data, row_separate_keys={"x": ["header_x"]}, row_i
     
     return data
 
-#TODO: we could merge the above functions
+#we could merge the above functions
 
 def convert_types(data, type_dict={"x": np.float32, "y": np.float32}, **kwargs):
     """

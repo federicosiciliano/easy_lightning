@@ -139,7 +139,6 @@ class RecMetric(torchmetrics.Metric):
 
         return kwargs
     
-#TODO: check RLS after rank_correction
 class RLS_Jaccard(RecMetric):
     '''
      ...
@@ -185,9 +184,6 @@ class RLS_Jaccard(RecMetric):
             self.total += relevance.shape[0]
 
 class RLS_RBO(RecMetric):
-    '''
-     TODO:...
-    '''
     def __init__(self, rbo_p=0.9, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.rbo_p = rbo_p

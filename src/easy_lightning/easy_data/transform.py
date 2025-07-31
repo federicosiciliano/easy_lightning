@@ -85,7 +85,7 @@ def split_data(data, split_keys={"x": ["train_x", "val_x", "test_x"], "y": ["tra
             del data[merged_var]
     return data
 
-# TODO: BUG--> It changes dtype from float32 to float64? Why?
+# It changes dtype from float32 to float64? Why?
 def scale_data(data, scaling_method=None, scaling_params={}, scaling_keys = {"train_x": ["train_x", "val_x", "test_x"]}, scaling_fit_params={}, scaling_transform_params={}, **kwargs):
     """
     Scales the data using a specified scaling method and parameters.
@@ -142,7 +142,7 @@ def reshape_and_scale(data, data_scaler, fit=False, **params):
 
     return data
 
-# TODO: BUG--> It changes dtype from float32 to float64? Why?
+# It changes dtype from float32 to float64? Why?
 def one_hot_encode_data(data, encode_keys={"y", "train_y", "val_y", "test_y"}, encode_fit_key="train_y", onehotencoder_params={"sparse_output": False}, **kwargs):
     """
     Performs one-hot encoding on categorical data in the specified keys.

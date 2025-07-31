@@ -600,11 +600,8 @@ def handle_nosave(cfg, key, value):
     # Remove the 'nosave' special character from the key
     key = key[1:]
 
-    #TODO: should take into account if the key contains other special characters (e.g. sweep)
-    #Fast fix: not working cause disappears from sweep
-    # if key[0] == yaml_sweep_char:
-    #     key = key[1:]
-    
+    #Should take into account if the key contains other special characters (e.g. sweep)
+
     # Assign the value to the cleaned key in cfg
     cfg[key] = value
 
@@ -854,7 +851,6 @@ class ConfigObject(dict):
         :param relative_key: The relative key to access values.
         :return: The value associated with the relative key.
         """
-        #TODO: error if key doesn't exist
         value = self  # Start with the entire configuration as the initial value
         
         # Split the relative key by dot to access nested values
@@ -986,7 +982,7 @@ class ConfigObject(dict):
             yield from self._sweep_single_key(sweep_dict, relative_key)
         
     #TODO: bug: if the key value is modified, it will not change in next iteration
-    #probably need to set self[relative_key] = value after the yield 
+    #probably need to set self[relative_key] = value after the yield
     def _sweep_single_key(self, sweep_dict, relative_key):
         if relative_key in sweep_dict:
             sweep_values = sweep_dict[relative_key]["values"] #TODO: more complex method if sweep is based on distribution

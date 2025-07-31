@@ -8,7 +8,7 @@ class BaseNN(pl.LightningModule):
                  step_routing = {"model_input_from_batch":[0],
                                  "loss_input_from_batch": [1], "loss_input_from_model_output": None,
                                  "metrics_input_from_batch": [1], "metrics_input_from_model_output": None},
-                 **kwargs): #TODO? change step order in computation: first model_output then batch
+                 **kwargs):
         super().__init__()
 
         # Store the main neural network module
@@ -36,7 +36,7 @@ class BaseNN(pl.LightningModule):
                 for key,value_to_log in value.items():
                     log_name = "_".join([x for x in [name, key] if x is not None and x != ""])
                     self.log(log_name, value_to_log)
-                    # if to_log.size() != 1 and len(to_log.size()) != 0: #Save metrics in batch; TODO: make this better
+                    # if to_log.size() != 1 and len(to_log.size()) != 0: #Save metrics in batch;
                     #     if split_name == "test":
                     #         save_path = os.path.join(self.logger.save_dir, self.logger.name, f'version_{self.logger.version}',f"metrics_per_sample.csv")
                     #         with open(save_path, 'a') as f_object:
@@ -55,7 +55,7 @@ class BaseNN(pl.LightningModule):
         #             #self.log(log_name, value_to_log)
         #             if isinstance(value, torchmetrics.MetricCollection):
         #                 to_log = value_to_log.compute()
-        #                 if to_log.size() != 1 and len(to_log.size()) != 0: #Save metrics in batch; TODO: make this better
+        #                 if to_log.size() != 1 and len(to_log.size()) != 0: #Save metrics in batch;
         #                     #if split_name == "test":
         #                         save_path = os.path.join(self.logger.save_dir, self.logger.name, f'version_{self.logger.version}',f"metrics_per_sample.csv")
         #                         with open(save_path, 'a') as f_object:
@@ -95,7 +95,6 @@ class BaseNN(pl.LightningModule):
                                                 model_output, self.step_routing["metrics_input_from_model_output"],
                                                 split_name, dataloader_idx)
 
-        #TODO: is this return correct?
         return lightning_module_return
 
     def compute_model_output(self, batch, model_input_from_batch):
@@ -179,11 +178,9 @@ class BaseNN(pl.LightningModule):
     def training_step(self, batch, batch_idx, dataloader_idx=0): return self.step(batch, batch_idx, dataloader_idx, "train")
 
     # Validation step
-    # TODO: why dataloader_idx=0?
     def validation_step(self, batch, batch_idx, dataloader_idx=0): return self.step(batch, batch_idx, dataloader_idx, "val")
 
     # Test step
-    # TODO: why dataloader_idx=0?
     def test_step(self, batch, batch_idx, dataloader_idx=0): return self.step(batch, batch_idx, dataloader_idx, "test")
     
     # Predict step
@@ -229,8 +226,9 @@ class BaseNN(pl.LightningModule):
     #             self.reset_metrics(metric)
 
 # Define functions for getting and loading torchvision models
-def get_torchvision_model(*args, **kwargs): return torchvision_utils.get_torchvision_model(*args, **kwargs)
-#TODO: add set seed
+def get_torchvision_model(*args, seed=42, **kwargs):
+    pl.seed_everything(seed) # Is this really useful?
+    return torchvision_utils.get_torchvision_model(*args, **kwargs)
 
 def get_torchvision_model_as_decoder(example_datum, *args, **kwargs):
     forward_model = torchvision_utils.get_torchvision_model(*args, **kwargs)

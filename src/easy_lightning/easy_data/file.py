@@ -42,7 +42,7 @@ def load_npz(filename, loader_params, **kwargs):
     arr = np.load(filename, **loader_params)
     return dict(arr.items())
 
-#TODO: load_pickle
+# def load_pickle(...)
 
 def load_image(filename, loader_params, **kwargs):
     """

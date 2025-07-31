@@ -28,7 +28,6 @@ def load_data(source="local", custom_data_functions=[], merge_before_split=False
         data = custom_function_dict["function"](data, **custom_function_dict["kwargs"])
 
     # If 'merge_before_split' is True, call the 'merge_splits' function to merge the data before splitting.
-    #TODO? do not use boolean to decide but other parameter
     if merge_before_split:
         merge_splits(**kwargs)
 
@@ -39,7 +38,6 @@ def load_data(source="local", custom_data_functions=[], merge_before_split=False
     data, data_scaler = scale_data(data, **kwargs)
 
     # If 'one_hot_encode' is True, call the 'one_hot_encode_data' function to one-hot encode the 'data' object.
-    #TODO? do not use boolean to decide but other parameter
     if one_hot_encode:
         data = one_hot_encode_data(data, **kwargs)
 

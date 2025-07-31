@@ -43,10 +43,11 @@ for _ in cfg.sweep(cfg["data_params"]["dataset_params"]["lookback"]):
     exp_found, experiment_id = easy_exp.exp.get_set_experiment_id(cfg)
     print("Experiment already found:", exp_found, "----> The experiment id is:", experiment_id)
 
-
-    if exp_found: exit() #TODO: make the notebook/script stop here if the experiment is already found
-
-
+    #if inside a parameter sweep:
+    # if exp_found: continue #continue to the next iteration of the sweep if the experiment is already found
+    #if not inside a parameter sweep:
+    # if exp_found: exit() #make the notebook/script stop here if the experiment is already found
+    
     trainer_params = easy_torch.preparation.prepare_experiment_id(cfg["model"]["trainer_params"], experiment_id)
 
     # Prepare callbacks and logger using the prepared trainer_params

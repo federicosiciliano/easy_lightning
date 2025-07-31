@@ -40,7 +40,6 @@ class CosRec(torch.nn.Module):
         self.fc_out = torch.nn.Linear(emb_size+fc_dim, num_items+1)
 
     def forward(self, item_seq, items_to_predict, user_ids):
-        #TODO: check dimensions
         """
         Args:
             seq_var: torch.FloatTensor with size [batch_size, max_sequence_length]
@@ -148,7 +147,6 @@ class CosRec2(torch.nn.Module):
         self.fc_out = torch.nn.Linear(emb_size+fc_dim, num_items+1)
 
     def forward(self, item_seq, items_to_predict, user_ids):
-        #TODO: check dimensions
         """
         Args:
             seq_var: torch.FloatTensor with size [batch_size, max_sequence_length]

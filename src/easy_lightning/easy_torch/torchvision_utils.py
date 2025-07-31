@@ -152,7 +152,7 @@ def change_conv_out_features(name, module, out_features=None):
         #                                                                 momentum=batch_norm_layer.momentum,
         #                                                                 affine=batch_norm_layer.affine,
         #                                                                 track_running_stats=batch_norm_layer.track_running_stats))
-        # TODO: now, it gives error because residual has different size
+        # check: now, it gives error because residual has different size
     else:
         setattr(module_section, attr_name, type(current_conv)(in_channels=current_conv.in_channels,
                                                             out_channels=[out_features, current_conv.out_channels][out_features is None],

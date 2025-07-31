@@ -1,274 +1,13 @@
 import torch
+import easy_torch.collators
+import easy_torch.datasets
 import pytorch_lightning as pl
 import multiprocessing
 from copy import deepcopy
 from . import model
-
-#TODO: pass this function inside easy_torch
-# Define a custom PyTorch Dataset class named DictDataset
-class DictDataset(torch.utils.data.Dataset):
-    """
-    Custom PyTorch Dataset class that takes a dictionary as input and returns items based on keys.
-
-    Args:
-        data (dict): Input dictionary containing data.
-
-    Returns:
-        dict: A dictionary where each key corresponds to a tensor item.
-    """
-    # Constructor to initialize the dataset with input data
-    def __init__(self, data):
-        self.data = data
-
-        # Convert each value in the data dictionary to a PyTorch tensor
-        # for key, value in self.data.items():
-        #     if isinstance(value, torch.Tensor):
-        #         self.data[key] = value.clone().detach()
-        #     else:
-        #         self.data[key] = torch.tensor(value)
-
-    # Method to get an item from the dataset at a given index
-    def __getitem__(self, index):
-        return {key: value[index] for key, value in self.data.items()}
-
-    # Method to get the length of the dataset
-    def __len__(self):
-        # Assumes that all values in the data dictionary have the same length
-        return len(self.data[list(self.data.keys())[0]])
-
-# class SequentialDataset(torch.utils.data.Dataset):
-#     def __init__(self, data):
-#         self.data = data
-#         super().__init__()
-
-#     def __getitem__(self, index):
-#         batch = super().__getitem__(index)
-#         for key,value in batch:
-#             print(key,value)
-#         print(sanaskjnas)
-
-# # Method to pair input and output sequences based on specified parameters
-# def pair_input_output(self, sequential_keys, padding_value, lookback, stride, lookforward, simultaneous_lookforward, out_seq_len, keep_last, drop_original=True):
-#     key_to_use = sequential_keys[0]
-#     max_len = self.data[key_to_use].shape[1]
-#     if out_seq_len is None: out_seq_len = max_len
-
-#     # Calculate input and output indices based on lookback, stride, and lookforward
-#     # input_indices = torch.stack([torch.arange(a-lookback,a) for a in range(max_len-lookforward, lookback-1, -stride)][::-1])
-#     input_indices = torch.stack([torch.arange(a-lookback,a) for a in range(max_len-lookforward-simultaneous_lookforward+1, max(lookback-1, max_len-lookforward-simultaneous_lookforward+1-out_seq_len), -stride)][::-1])
-#     # output_indices = torch.stack([torch.arange(a-lookback,a) for a in range(max_len, lookback-1+lookforward, -stride)][::-1])
-#     output_indices = torch.stack([torch.stack([torch.arange(b-simultaneous_lookforward+1,b+1) for b in torch.arange(a-lookback,a)]) for a in range(max_len, max(lookback-1+lookforward+simultaneous_lookforward-1,max_len-out_seq_len), -stride)][::-1])
+import easy_torch
     
-#     # Get non-sequential keys in the data dictionary
-#     non_sequential_keys = [key for key in self.data.keys() if key not in sequential_keys]
-
-#     # Process each sequential key
-#     for key in sequential_keys:
-#         # Create input and output sequences based on calculated indices
-#         self.data[f"in_{key}"] = self.data[key][:,input_indices]
-#         self.data[f"out_{key}"] = self.data[key][:,output_indices]
-
-#         # Remove output values where input is padding
-#         input_is_padding = torch.isclose(self.data[f"in_{key}"], padding_value*torch.ones_like(self.data[f"in_{key}"]))
-#         self.data[f"out_{key}"][input_is_padding] = padding_value
-
-#         # Remove rows where all input or all output is padding
-#         to_keep = torch.logical_and(
-#             torch.logical_not(input_is_padding.all(-1)),
-#             torch.logical_not(torch.isclose(self.data[f"out_{key}"], padding_value*torch.ones_like(self.data[f"out_{key}"])).all(-1).all(-1)))
-
-#         self.data[f"in_{key}"] = self.data[f"in_{key}"][to_keep]
-#         self.data[f"out_{key}"] = self.data[f"out_{key}"][to_keep]
-
-#         # Remove output values if index is before out_seq_len from the end
-#         # Option 1: keep same shape
-#         # self.data[f"out_{key}"][:, :-out_seq_len] = padding_value
-#         # Option 2: shorten array
-#         self.data[f"out_{key}"] = self.data[f"out_{key}"][:, max(-keep_last,-out_seq_len+self.data[f"out_{key}"].shape[-1]-1):]
-#         # Shorten by number of samples reserved to this split, also removing simultaneous_lookforward
-
-#         # Optional: Squeeze out the last dimension if simultaneous_lookforward is 1
-#         # if simultaneous_lookforward == 1:
-#         #     self.data[f"out_{key}"] = self.data[f"out_{key}"].squeeze(-1)
-
-#         # Optionally, drop the original key from the data dictionary
-#         if drop_original:
-#             del self.data[key]
-
-#     # Repeat the indices of non-dropped rows for non-sequential keys
-#     orig_rows_repeat = torch.where(to_keep)[0]
-
-#     # Process each non-sequential key
-#     for key in non_sequential_keys:
-#         self.data[key] = self.data[key][orig_rows_repeat]
-
-#TODO: which parent class to use?
-#TODO: move this into easy_torch
-class SequentialCollator:
-    def __init__(self,
-                 sequential_keys,
-                 lookback,
-                 padding_value=0, 
-                 left_pad=True, 
-                 lookforward=1, 
-                 simultaneous_lookforward=1,
-                 simultaneous_lookback = 0,
-                 out_seq_len=None,
-                 keep_last = None,
-                 drop_original=True):
-        
-        self.sequential_keys = sequential_keys
-        self.padding_value = padding_value
-        self.left_pad = left_pad
-        self.lookback = lookback
-        
-        self.lookforward = lookforward
-        self.simultaneous_lookforward = simultaneous_lookforward
-        self.simultaneous_lookback = simultaneous_lookback
-        self.out_seq_len = out_seq_len
-        
-        self.keep_last = keep_last
-        if keep_last is None:
-            self.keep_last = lookback
-
-        self.drop_original = drop_original
-
-        if self.left_pad:
-            self.pad_x_function = self.reverse
-            self.pad_out_func = self.flip
-        else:
-            self.pad_x_function = self.identity
-            self.pad_out_func = self.identity
-
-        self.needed_length = self.lookback + self.lookforward + self.simultaneous_lookforward +self.simultaneous_lookback
-        
-    #Functions needed because AttributeError: Can't pickle local object 'SequentialCollator.__init__.<locals>.<lambda>'
-    def identity(self, x):
-        return x
-    
-    def reverse(self, x):
-        return x[::-1]
-    
-    def flip(self, x):
-        return x.flip(dims=[1])
-    
-    def extra_pad(self, x):
-        if self.needed_length <= x.shape[1]:
-            return x
-        else:
-            return torch.cat([x, torch.zeros((x.shape[0], self.needed_length - x.shape[1]),dtype=x.dtype)],dim=1)
-            #return torch.cat([x, self.padding_value*torch.ones((x.shape[0], self.needed_length - x.shape[1]),dtype=x.dtype)],dim=1)
-
-    def __call__(self, batch):
-        seq_lens = torch.tensor([len(x[self.sequential_keys[0]]) for x in batch])
-
-        out = self.main_call(batch, seq_lens)
-    
-        return out
-    
-    def main_call(self, batch, seq_lens):
-        out = {}
-        
-        # Pad the sequences in the data using specified parameters
-        for key in batch[0].keys():
-            if key in self.sequential_keys:
-                out[key] = self.pad_list_of_tensors([x[key] for x in batch])
-            else:
-                out[key] = torch.stack([torch.tensor(x[key]) for x in batch])
-        
-        # Pair input and output sequences based on specified parameters
-        out = self.pair_input_output(out, seq_lens)
-        return out
-
-    # Method to pad a list of tensors and return the padded sequence as a tensor
-    def pad_list_of_tensors(self, list_of_tensors):
-        padded = torch.nn.utils.rnn.pad_sequence([torch.tensor(self.pad_x_function(x)) for x in list_of_tensors], batch_first=True, padding_value=self.padding_value)
-        
-        padded = self.extra_pad(padded)
-
-        #Also add padding for simultaneous_lookforward
-        sim_lookf_pad = self.padding_value*torch.ones((len(padded),self.simultaneous_lookforward-1))
-        lookf_pad = self.padding_value*torch.ones((len(padded),self.lookforward))
-        padded = torch.concat([sim_lookf_pad,padded,lookf_pad],dim=1)
-
-        padded = self.pad_out_func(padded)
-
-        # Change type to type of first non-empy list in list of tensors
-        for x in list_of_tensors:
-            if len(x)>0: break
-        padded = padded.type(getattr(torch,str(type(x[0]).__name__)))
-
-        return padded
-    
-    # Method to pair input and output sequences based on specified parameters
-    # Now based on left_padding; TODO: reverse array if opposite
-    def pair_input_output(self, data, seq_lens):
-        if self.out_seq_len is None:
-            out_seq_len = seq_lens
-        else:
-            if isinstance(self.out_seq_len, float):
-                out_seq_len = torch.ceil((self.out_seq_len*seq_lens)).int()
-            else:
-                out_seq_len = self.out_seq_len*torch.ones_like(seq_lens)
-
-        # decide current point t;
-        # input goes from t-lookback+1 to t;
-        # output goes from t+lookforward to t+lookforward+simultaneous_lookforward
-        #TODO: check NEW output goes from t+lookforward-simultaneous_lookforward to 
-        output_poss_end_ids = seq_lens #-self.lookforward+1
-        output_poss_start_ids = torch.maximum(output_poss_end_ids-out_seq_len,torch.zeros_like(seq_lens))
-
-        input_poss_start_ids = output_poss_start_ids - self.lookforward
-        input_poss_end_ids = output_poss_end_ids - self.lookforward
-
-        true_starting_point = data[self.sequential_keys[0]].shape[1] - (seq_lens+(self.simultaneous_lookforward-1))
-        input_poss_start_ids += true_starting_point
-        input_poss_end_ids += true_starting_point
-
-        input_poss_start_ids = torch.minimum(input_poss_start_ids+(self.lookback-1),input_poss_end_ids-1)
-        input_poss_start_ids = torch.maximum(input_poss_start_ids,(self.lookback-1)*torch.ones_like(seq_lens))
-
-        #.int() floors the number, so max_len can't be selected (good, cause is out of bounds)
-        # Generate random indices for output sequences
-        rand = torch.randint(2**63 - 1, size=(len(seq_lens),))
-        current_index = (rand % (input_poss_end_ids - input_poss_start_ids) + input_poss_start_ids).int()
-        
-        if (current_index < 0).any():
-            raise ValueError("Some current index is negative")
-
-        # subtract lookback
-        input_indices = current_index.unsqueeze(1) - (torch.arange(self.lookback).flip(dims=[0])).unsqueeze(0)
-
-        # Compute input indices based on output indices
-        output_indices = input_indices + self.lookforward
-
-        # Add simultaneous_lookforward and simultaneous_lookback to output indices
-        output_indices = output_indices.unsqueeze(2) + torch.arange(-self.simultaneous_lookback,self.simultaneous_lookforward).unsqueeze(0).unsqueeze(0)
-
-        # Process each sequential key
-        for key in self.sequential_keys:
-            # Create input and output sequences based on calculated indices
-            data[f"in_{key}"] = data[key][torch.arange(data[key].shape[0]).unsqueeze(-1),input_indices]
-            data[f"out_{key}"] = data[key][torch.arange(data[key].shape[0]).unsqueeze(-1).unsqueeze(-1),output_indices]
-
-            # Remove output values if index is before out_seq_len from the end
-            # Option 1: keep same shape
-            # self.data[f"out_{key}"][:, :-out_seq_len] = padding_value
-            # Option 2: shorten array
-            to_keep = -min(self.keep_last,out_seq_len.max())
-            data[f"out_{key}"] = data[f"out_{key}"][:, to_keep:]
-            # Shorten by number of samples reserved to this split, also removing simultaneous_lookforward
-
-            # Optional: Squeeze out the last dimension if simultaneous_lookforward is 1
-            # if simultaneous_lookforward == 1:
-            #     self.data[f"out_{key}"] = self.data[f"out_{key}"].squeeze(-1)
-
-            if self.drop_original:
-                del data[key]
-        
-        return data
-    
-class SmartPaddingSequentialCollator(SequentialCollator):
+class SmartPaddingSequentialCollator(easy_torch.collators.SequentialCollator):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.needed_length_backup = self.needed_length
@@ -288,7 +27,7 @@ class SmartPaddingSequentialCollator(SequentialCollator):
 
         return out
     
-class RecommendationSequentialCollator(SequentialCollator):
+class RecommendationSequentialCollator(easy_torch.collators.SequentialCollator):
     def __init__(self,
                  num_items,
                  primary_key="sid",
@@ -508,7 +247,7 @@ def prepare_rec_datasets(data,
                 data_to_use[key] = data[f"{split_name}_{key}"]
 
         # Create the DataLoader
-        datasets[split_name] = DictDataset(data_to_use, **split_dataset_params)
+        datasets[split_name] = easy_torch.datasets.DictDataset(data_to_use, **split_dataset_params)
 
     return datasets
 

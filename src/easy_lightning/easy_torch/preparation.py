@@ -92,7 +92,7 @@ def prepare_experiment_id(original_trainer_params, experiment_id, cfg=None):
             trainer_params["logger"]["params"]["id"] = experiment_id
             trainer_params["logger"]["params"]["name"] = experiment_id
             if cfg is not None:
-                trainer_params["logger"]["params"]["config"] = cfg #TODO: Clean configuration
+                trainer_params["logger"]["params"]["config"] = cfg
     return trainer_params
 
 # Function to prepare callbacks
@@ -258,8 +258,6 @@ def get_function(function_name, *modules):
     return getattr(function_module, function_name)
 
 def prepare_metrics(metrics_info, *additional_modules, split_keys={"train":1,"val":2,"test":3}, seed=42):
-    # TODO: repeat metric if same dataloader is used for multiple splits?
-
     # Initialize an empty dictionary to store metrics
     metrics = {}
     if isinstance(metrics_info, dict) and all([key in metrics_info for key in split_keys.keys()]):
@@ -302,7 +300,7 @@ def handle_FakeMetricCollection(metric_name, metric_params, *additional_modules)
     # Check if the metric name is "FakeMetricCollectionMetric"
     true_metric_name = metric_name
     if "FakeMetricCollection" in metric_name:
-        metric_name,true_metric_name = metric_name.split(":") #TODO Check if best way to split
+        metric_name,true_metric_name = metric_name.split(":")
         # Get the actual class from the name
         metric_params = {**metric_params, "metric_class": get_function(true_metric_name, *additional_modules, custom_metrics, torchmetrics)} #to avoid overwriting the original metric_params
     return metric_name, true_metric_name, metric_params
@@ -470,8 +468,6 @@ def complete_prepare_model(cfg, main_module, *additional_modules, model_params=N
     model = process.create_model(main_module, **model_params)
 
     return model
-
-#TODO: check additional_modules functionality
 
 # Deprecated
 def prepare_profiler(trainer_params, additional_module=None, seed=42):
