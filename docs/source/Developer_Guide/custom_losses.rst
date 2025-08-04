@@ -1,4 +1,4 @@
-Defining and Loading Loss Functions in EasyLightning
+Custom Loss
 =====================================================
 
 1. How to Define a Loss in ``model.yaml``

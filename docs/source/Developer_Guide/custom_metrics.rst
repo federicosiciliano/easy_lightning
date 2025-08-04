@@ -1,4 +1,4 @@
-Defining and Loading Metrics in EasyLightning
+Custom Metrics
 =============================================
 
 1. How to Define Metrics in ``model.yaml``

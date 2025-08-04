@@ -40,7 +40,8 @@ So far, we've developed EasyTorch and EasyRec. If you'd like to help us develop 
    :maxdepth: 1
    :caption: Developer Guide
 
-   Developer_Guide/custom_loss
+   Developer_Guide/custom_metrics
+   Developer_Guide/custom_losses
 
 .. toctree::
    :maxdepth: 1
