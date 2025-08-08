@@ -1,72 +1,59 @@
-# Easy Lightning: 🚀 Streamlining Deep Learning with PyTorch Lightning
+# Easy Lightning
 
-**Easy Lightning** is a versatile Python library meticulously crafted to streamline the process of configuring and building AI-Deep learning models using the power of PyTorch Lightning and PyTorch models. With its unique configuration-based approach, Easy Lightning empowers developers and data scientists to effortlessly harness the full potential of deep learning.
+[![Docs](https://img.shields.io/badge/Documentation-Read%20the%20Docs-blue)](https://easy-lightning-test.readthedocs.io/en/latest/)
 
-## 🌟 Key Features
 
-1. **User-Friendly Configuration:** Easy Lightning revolutionizes the way you work with deep learning by providing a seamless configuration-based interface. All your settings can be easily defined in YAML files, making it painless to tweak and fine-tune your experiments.
+<img src="docs/source/_static/logo.png" alt="Easy Lightning Logo" width="500"/>
 
-2. **Three Essential Utilities:**
-   - 📊 **Data:** Easy Lightning simplifies data handling, allowing you to load and preprocess data effortlessly.
-   - 📝 **Experiments:** Define, track, and save experiments with unique IDs to prevent duplication. Keep your work organized and accessible.
-   - ⚙️ **Torch Integration:** Seamlessly integrate PyTorch models, train, test, and save your models with minimal effort. Easy Lightning handles the heavy lifting, so you can focus on innovation.
 
-## 🚀 Why Choose Easy Lightning?
 
-- **Efficiency:** Say goodbye to repetitive and time-consuming setup tasks. Easy Lightning automates the tedious parts of deep learning, giving you more time for experimentation and innovation.
+**Easy Lightning** is a flexible and extensible framework for building deep learning models with ease using PyTorch Lightning. It simplifies training, experimentation, and deployment across tasks and datasets — with a focus on modularity and reproducibility.
 
-- **Flexibility:** Whether you're a seasoned deep learning practitioner or just getting started, Easy Lightning adapts to your needs. Its configuration-based approach makes it accessible to all skill levels.
+It currently includes two main modules:
 
-- 🛡️ **Error Prevention:** With experiment IDs and organized project management, Easy Lightning ensures that your work remains clean and error-free, even as your projects scale.
+- **EasyTorch** — designed for vision and general deep learning tasks.
+- **EasyRec** — tailored specifically for building recommendation systems.
 
-## 📁 Important Files and Folders in the Project
+---
 
-Below is an outline of key files and folders you'll find in this project, along with their purposes:
+## 🚀 Features
 
-### Files
+- **Modular Design**: Plug in new datasets, models, loss functions, or optimizers with minimal effort.
+- **Config-Driven**: Fully customizable experiments via YAML configuration files.
+- **Extendable Framework**: Add your own components — from metrics to data augmentations — without changing the core logic.
+- **Built-in Modules**: Includes EasyTorch and EasyRec for general-purpose and recommendation system tasks.
 
-1. **setup.py**
-    - Setup script for Python's setuptools. Specifies package metadata, dependencies, and other distribution essentials.
+---
 
-2. **requirements.txt**
-    - Lists required Python packages and their versions. Ensures that necessary dependencies are installed.
-  
-    - Currently includes:
-        - PyTorch: Popular deep learning library.
-        - PyTorch Lightning: Lightweight PyTorch wrapper.
+## 📦 Installation and ⚡ QuickStart
 
-3. **README.md**
-    - Provides an overview of the project and usage instructions.
+```bash
+pip install easy-lightning
+```
 
-4. **.gitignore**
-    - Specifies files and folders that should be ignored by Git, ensuring that unnecessary or sensitive data is not included in the version control.
+Initialize a new project scaffold:
+```bash
+easy-lightning init
+```
+This will create the configuration and directory structure needed to get started right away.
 
-### Folders
+## 📚 Documentation
 
-1. **easy_data**
-    - Contains utilities for data loading, file management, data and data structure management, data splitting, and statistics.
+Full guides, configuration tutorials, and API references are available at:
 
-2. **easy_exp**
-    - Manages experiments by defining unique IDs based on their configuration.
-    - Allows for hashing of each ID to check for previously conducted experiments.
-    - Excludes GPU/CPU usage and training modes from the experiment ID.
-    - Saves experiments in a specific file along with their relative configuration.
-    - Includes methods for parsing YAML configs and handles special characters used in them (e.g., through `var.py`).
+🔗 [Easy Lightning Docs](https://easy-lightning-test.readthedocs.io/en/latest/)
 
-3. **easy_torch**
-    - Includes functions for metrics, loading models, and creating trainers in PyTorch Lightning.
-    - Defines steps, loss, optimizer, and other parameters to use.
-    - Sets callbacks and dataloaders.
-    - Manages TorchVision models, allowing you to load them and modify their internal modules if necessary.
-    - Also includes utilities for training and testing the model, as well as saving and reading logs.
 
-4. **cfg**
-    - Contains demo configurations used in testing phase of this repo.
-
-5. **ntb**
-    - Houses three notebooks for testing the utilities offered by the three utility folders.
-    - Also includes a notebook with information about the objectives and logic used in the implementation.
-
-By understanding the role of each file and folder, you'll be better equipped to navigate and work on the project.
-
-Start your deep learning journey with Easy Lightning today and experience a new level of simplicity and efficiency in creating and configuring AI-Deep learning notebooks.
+## 📖 How to cite
+If you use Easy Lightning in your research or project, please cite us:
+```bibtex
+@article{betello2024reproducible,
+  title={A Reproducible Analysis of Sequential Recommender Systems},
+  author={Betello, Filippo and Purificato, Antonio and Siciliano, Federico and Trappolini, Giovanni and Bacciu, Andrea and Tonellotto, Nicola and Silvestri, Fabrizio},
+  journal={IEEE Access},
+  year={2024},
+  publisher={IEEE}
+}
+```
+## 🤝 Contributing
+We welcome contributions! If you want to add a new module or fix a bug, feel free to open an issue or submit a pull request.

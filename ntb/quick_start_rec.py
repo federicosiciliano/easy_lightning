@@ -6,7 +6,7 @@ from copy import deepcopy
 # if you want to debug with the local code, change the name of the folder in easylightning2 from easy_lightning
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'src'))
-from easy_lightning2 import easy_exp, easy_rec, easy_torch
+from easy_lightning import easy_exp, easy_rec, easy_torch
 
 # otherwise decomment this line
 # from easy_lightning import easy_exp, easy_rec, easy_torch

@@ -23,7 +23,7 @@ So far, we've developed EasyTorch and EasyRec. If you'd like to help us develop 
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Get Started
 
    Get_Started/installation
@@ -42,6 +42,7 @@ So far, we've developed EasyTorch and EasyRec. If you'd like to help us develop 
 
    Developer_Guide/custom_metrics
    Developer_Guide/custom_losses
+   Developer_Guide/custom_dataset
 
 .. toctree::
    :maxdepth: 1
