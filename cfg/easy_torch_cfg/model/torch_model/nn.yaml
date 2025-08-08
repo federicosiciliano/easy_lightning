@@ -11,7 +11,3 @@ seed: ${exp.seed}
 activation_function:
   - Tanh
   - LeakyReLU
-
-+loader_params: loader_params_cfg
-
-+trainer_params: trainer_params_cfg

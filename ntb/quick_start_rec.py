@@ -66,4 +66,4 @@ def main():
         
 if __name__ == "__main__":
     main()
-    print("Quick start for recommendation finished successfully!")
+    print("\n\nQuick start for recommendation finished successfully!\n\n")

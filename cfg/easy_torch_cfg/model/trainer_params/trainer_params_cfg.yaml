@@ -1,6 +1,9 @@
 /accelerator: auto
+/devices: &devices [0]
 /enable_checkpointing: True
-max_epochs: 1 #2000
+£max_epochs: 
+    default: 1 #2000
+    values: [1, 2, 3, 4, 5] #sweep
 callbacks:
     - EarlyStopping:
         monitor: val_loss

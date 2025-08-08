@@ -1,6 +1,4 @@
 import torch
-import easy_torch.collators
-import easy_torch.datasets
 import pytorch_lightning as pl
 import multiprocessing
 from copy import deepcopy
@@ -735,7 +733,7 @@ def prepare_rec_datasets(data,
                 data_to_use[key] = data[f"{split_name}_{key}"]
 
         # Create the DataLoader
-        datasets[split_name] = easy_torch.datasets.DictDataset(data_to_use, **split_dataset_params)
+        datasets[split_name] = DictDataset(data_to_use, **split_dataset_params)
 
     return datasets
 
