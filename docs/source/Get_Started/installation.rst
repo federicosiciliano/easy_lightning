@@ -18,7 +18,7 @@ Once installed, you can initialize a new project using the command-line tool pro
 
     easy-lightning init
 
-This will create a new project scaffold with all necessary configuration and file structure to start working with `easy-lightning`.
+This will create a new project scaffold with all necessary configuration and file structure to start working with `easy-lightning`.  
 
 Next Steps
 -----------
