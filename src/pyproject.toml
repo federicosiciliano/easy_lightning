@@ -1,7 +1,7 @@
 [project]
 name = "easy_lightning"
 description = "Easy Lightning: Simplify AI-Deep learning with PyTorch Lightning"
-version = "1.0.0"
+version = "1.0.2"
 authors = [
   { name="Filippo Betello", email="betello@diag.uniroma1.it" },
   { name="Maria Diana Calagaru", email="calagaru@diag.uniroma1.it" },
@@ -42,7 +42,7 @@ dependencies = [
 ]
 
 [project.scripts]
-EasyLightning-init = "easy_lightning.cli:init_project"
+easy-lightning-init = "easy_lightning.cli:init_project"
 
 [tool.setuptools.package-data]
 "easy_lightning" = ["cfg/**/*"]
