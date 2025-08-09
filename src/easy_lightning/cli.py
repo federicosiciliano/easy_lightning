@@ -10,3 +10,11 @@ def init_project():
     else:
         shutil.copytree(src, dst)
         print(f"'cfg' folder copied in: {dst}")
+
+    src = Path(__file__).parent / "ntb"
+    dst = Path.cwd() / "ntb"
+    if dst.exists():
+        print("ntb folder was already in the current directory!")
+    else:
+        shutil.copytree(src, dst)
+        print(f"'ntb' folder copied in: {dst}")

@@ -1,12 +1,5 @@
 # Easy Lightning
 
-[![Docs](https://img.shields.io/badge/Documentation-Read%20the%20Docs-blue)](https://easy-lightning-test.readthedocs.io/en/latest/)
-
-
-<img src="docs/source/_static/logo.png" alt="Easy Lightning Logo" width="500"/>
-
-
-
 **Easy Lightning** is a flexible and extensible framework for building deep learning models with ease using PyTorch Lightning. It simplifies training, experimentation, and deployment across tasks and datasets — with a focus on modularity and reproducibility.
 
 It currently includes two main modules:
