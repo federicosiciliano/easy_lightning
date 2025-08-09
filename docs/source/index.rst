@@ -27,6 +27,7 @@ So far, we've developed EasyTorch and EasyRec. If you'd like to help us develop 
    :caption: Get Started
 
    Get_Started/installation
+   Get_Started/quick_start
 
 .. toctree::
    :maxdepth: 1
