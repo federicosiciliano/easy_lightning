@@ -15,7 +15,7 @@ Make sure you have **easy-lightning** installed and have initialized your projec
 .. code-block:: bash
 
     pip install easy-lightning
-    easy-lightning init
+    easy-lightning-init
 
 Running the ``rec`` Quick Start
 -------------------------------
