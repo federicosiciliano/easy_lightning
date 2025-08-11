@@ -33,7 +33,7 @@ pip install easy-lightning
 
 Initialize a new project scaffold:
 ```bash
-easy-lightning init
+easy-lightning-init
 ```
 This will create the configuration and directory structure needed to get started right away.
 
