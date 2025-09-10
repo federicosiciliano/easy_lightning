@@ -16,7 +16,7 @@ project = 'Easy Lightning'
 copyright = '2025, Federico Siciliano, Filippo Betello, Antonio Purificato, Giulia Di Teodoro, Erica Luciani, Maria Diana Calugaru.'
 author = 'Federico Siciliano, Filippo Betello, Antonio Purificato, Giulia Di Teodoro, Erica Luciani, Maria Diana Calugaru.'
 
-release = '0.1.0'
+release = '1.0.0'
 version = release
 
 # -- General configuration ---------------------------------------------------

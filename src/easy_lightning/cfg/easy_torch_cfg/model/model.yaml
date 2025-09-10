@@ -1,0 +1,44 @@
+optimizer:
+  name: Adam
+  params:
+    lr: 1.0e-1
+    weight_decay: 0.0005
+
+loss: CrossEntropyLoss
+
+
+name: resnet18 #34
+#+ backend: torch
+
+#num_parameters: [1,10,100,200,1000]
+
+torchvision_params:
+  weights: Null
+    # - Null
+    # - -__:
+    #     value: torchvision.models.ResNet18_Weights
+    #     eval: eval
+
+#output_size: 1
+
+
+log_params:
+  on_epoch: True
+  on_step: False
+
+emission_tracker:
+  use: True
+  tracking_mode: process
+  log_level: critical
+  /output_dir: ${__exp__.project_folder}out/log/${__exp__.name}/
+
+flops_profiler:
+  use: True
+  /output_dir: ${__exp__.project_folder}out/log/${__exp__.name}/
+
+
++loader_params: loader_params_cfg
+
++trainer_params: trainer_params_cfg
+
++torch_model: resnet18
