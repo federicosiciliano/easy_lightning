@@ -1,6 +1,6 @@
 import torch
-import easy_torch.collators
-import easy_torch.datasets
+import easy_lightning.easy_torch.collators
+import easy_lightning.easy_torch.datasets
 import pytorch_lightning as pl
 import multiprocessing
 from copy import deepcopy
@@ -466,17 +466,17 @@ class RecommendationSequentialCollator(SequentialCollator):
         else:
             raise NotImplementedError(f"Unsupported possible_negatives: {possible_negatives}")
         
-        if negatives_distribution not in {"uniform",'dynamic'} and not isinstance(negatives_distribution, torch.Tensor): #modifica_g : aggiunto il caso di campionamento dinamico dei negativi  durante il training
-            raise NotImplementedError(f"Unsupported negatives_distribution: {negatives_distribution}")
         self.negatives_distribution = negatives_distribution
         if self.negatives_distribution == "uniform":
             self.sample_from_negative_distribution = self.uniform_negatives
+        elif self.negatives_distribution == "unique":
+            self.sample_from_negative_distribution = self.unique_negatives
         elif isinstance(negatives_distribution, torch.Tensor):
             self.sample_from_negative_distribution = self.distr_negatives
         elif callable(negatives_distribution):
             self.sample_from_negative_distribution = negatives_distribution
         else:
-            raise NotImplementedError(f"Unsupported negatives_distribution: {negatives_distribution}")
+            raise NotImplementedError(f"Unsupported negatives_distribution: {self.negatives_distribution}")
             
         self.relevance = relevance
         self.normalize_relevance = normalize_relevance
@@ -535,6 +535,9 @@ class RecommendationSequentialCollator(SequentialCollator):
 
             out[self.out_key] = torch.cat([out[self.out_key], negatives], dim=-1) #concatenate negatives to out[out_key]
         
+            out_is_padding = torch.isclose(out[self.out_key], self.padding_value*torch.ones_like(out[self.out_key]))
+            not_to_use = torch.logical_or(out_is_padding, not_to_use)
+
             negatives_relevance_tensor = self.negatives_relevance*torch.ones_like(negatives)
             #negatives_relevance_tensor[negative_is_positive.any(-2)] = (out["relevance"][:,:,:self.num_positives,None]*negative_is_positive)[negative_is_positive].type(out["relevance"].dtype) # Do not use negative if is positive, i.e. positives cannot be negatives
             out["relevance"] = torch.cat([out["relevance"], negatives_relevance_tensor], dim=-1) #concatenate negatives relevance to relevance
@@ -586,6 +589,21 @@ class RecommendationSequentialCollator(SequentialCollator):
                 torch.Tensor: Uniformly sampled negative item IDs.
         """
         return possible_negatives[torch.randint(0, len(possible_negatives), (n,))]
+    
+    def unique_negatives(self, possible_negatives, n, *args):
+        """
+            Samples unique negatives from candidate negatives, padding if necessary.
+            
+            Args:
+                possible_negatives (torch.Tensor): Candidate negative item IDs.
+                n (int): Number of negatives to sample.
+            Returns:
+                torch.Tensor: Unique negative item IDs sampled, padded if fewer than n candidates.
+        """
+        negatives = possible_negatives[torch.randperm(len(possible_negatives))[:n]]
+        if len(possible_negatives) <= n:
+            negatives = torch.cat([negatives, self.padding_value*torch.ones(n-len(negatives),dtype=negatives.dtype)],dim=0)
+        return negatives
     
     def distr_negatives(self, possible_negatives, n, *args):
         """
@@ -734,8 +752,8 @@ def prepare_rec_datasets(data,
             else: #If key is not in data, try to get it using split_name
                 data_to_use[key] = data[f"{split_name}_{key}"]
 
-        # Create the DataLoader
-        datasets[split_name] = easy_torch.datasets.DictDataset(data_to_use, **split_dataset_params)
+        # Create the Dataset
+        datasets[split_name] = easy_lightning.easy_torch.datasets.DictDataset(data_to_use, **split_dataset_params)
 
     return datasets
 

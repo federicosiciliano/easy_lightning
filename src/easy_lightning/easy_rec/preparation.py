@@ -103,3 +103,8 @@ def prepare_rec_model(cfg, maps=None, data_params=None, rec_model_params=None):
     main_module = rec_torch.create_rec_model(**rec_model_params)#, graph=easy_rec.data_generation_utils.get_graph_representation(data["train_sid"]))
     
     return main_module
+
+
+
+
+#TODO FS: fix preparation, avoid redundancy with rec_torch

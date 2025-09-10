@@ -12,11 +12,12 @@ class BaseNN(pl.LightningModule):
         main_module (torch.nn.Module): The main neural network module.
         loss (torch.nn.Module or dict): The primary loss function or a dictionary of loss functions.
         optimizer (callable): The optimizer function to be used for training.
+        scheduler (callable or dict, optional): Learning rate scheduler function or a dictionary containing scheduler configuration.
         metrics (dict): A dictionary of metrics to be used for evaluation.
         log_params (dict): Parameters for logging, such as whether to log on epoch end.
         step_routing (dict): A dictionary defining how batch and model output are routed to the model, loss, and metrics.
     """
-    def __init__(self, main_module, loss, optimizer, metrics={}, log_params={},
+    def __init__(self, main_module, loss, optimizer, scheduler=None, metrics={}, log_params={},
                  step_routing = {"model_input_from_batch":[0],
                                  "loss_input_from_batch": [1], "loss_input_from_model_output": None,
                                  "metrics_input_from_batch": [1], "metrics_input_from_model_output": None},
@@ -26,8 +27,9 @@ class BaseNN(pl.LightningModule):
         # Store the main neural network module
         self.main_module = main_module
 
-        # Store the optimizer function
+        # Store the optimizer and scheduler
         self.optimizer = optimizer
+        self.scheduler = scheduler
 
         # Store the primary loss function
         self.loss = loss
@@ -105,14 +107,29 @@ class BaseNN(pl.LightningModule):
 
     def configure_optimizers(self):
         """
-        Configure the optimizer for training.
+        Configure the optimizer(s) and learning rate scheduler(s) for the model.
 
         Returns:
-        torch.optim.Optimizer: Instantiated optimizer for model parameters.
+            dict: A dictionary containing the optimizer and optionally the learning rate scheduler.
+            The dictionary can contain:
+                - "optimizer": The optimizer instance.
+                - "lr_scheduler": A dictionary or callable for the learning rate scheduler.
         """
-        optimizer = self.optimizer(self.parameters())   
-        return optimizer
+        optimizer = self.optimizer(self.parameters())
 
+        return_dict = {"optimizer": optimizer}
+
+        if self.scheduler is not None:
+            if isinstance(self.scheduler, dict):
+                # If scheduler is a dict, we assume it contains the information to create a scheduler
+                self.scheduler["scheduler"] = self.scheduler["scheduler"](optimizer)
+                return_dict['lr_scheduler'] = self.scheduler
+            else:  # If scheduler is not a dict, we assume it is a callable that returns a scheduler
+                return_dict['lr_scheduler'] = self.scheduler(optimizer)
+        return return_dict
+    
+    # def lr_scheduler_step(self, scheduler, metric):
+    #     scheduler.step(epoch=self.current_epoch)  # if scheduler need the epoch value
 
     def step(self, batch, batch_idx, dataloader_idx, split_name): #not a lightning method
         #TODO: what to do with batch_idx and dataloader_idx?

@@ -227,22 +227,47 @@ def prepare_trainer(seed=42, raytune=False, **trainer_kwargs):
     return trainer
 
 # Function to prepare a loss function
-def prepare_loss(loss_info, *additional_modules, seed=42):
-    pl.seed_everything(seed, verbose=False) # Seed the random number generator
-    if isinstance(loss_info, str):
-        # If 'loss' is a string, assume it's the name of a loss function
-        loss = get_single_loss(loss_info, {}, *additional_modules)
-    elif isinstance(loss_info, dict):
-        # If 'loss' is a dictionary, assume it contains loss name and parameters
-        loss = {}
-        for loss_name, loss_params in sorted(loss_info.items()):
-            if loss_name != "__weight__":
-                loss[loss_name] = get_single_loss(loss_params["name"], loss_params.get("params",{}), *additional_modules)
-        loss = torch.nn.ModuleDict(loss)
-        loss.__weight__ = loss_info.get("__weight__", torch.ones(len(loss)))
+def prepare_loss(loss_info, *additional_modules, split_keys={"train":1,"val":2,"test":3}, seed=42):
+
+    pl.seed_everything(seed)
+    losses = {}
+    # Controlla se losses_info è già suddiviso per split
+    if isinstance(loss_info, dict) and all([key in loss_info for key in split_keys.keys()]):
+        losses_info_already_split = True
     else:
-        raise NotImplementedError
-    return loss
+        losses_info_already_split = False
+    
+    for split_name, num_dataloaders in split_keys.items():
+        losses[split_name] = [] # Lista di loss per ogni dataloader di questo split
+
+        for dataloader_idx in range(num_dataloaders):
+            # Se losses_info è già suddiviso per split, usa direttamente il valore corrispondente
+            if losses_info_already_split:
+                loss_info_to_use = loss_info[split_name][dataloader_idx]
+            # Altrimenti, usa NCOD per train, CE per val/test
+            else:
+                loss_info_to_use = loss_info
+                
+            # Se il valore è una stringa, significa che è un singolo loss da usare
+            if isinstance(loss_info_to_use, str):
+                loss = get_single_loss(loss_info_to_use, {}, *additional_modules)
+            # Se il valore è un dizionario, significa che è un loss con parametri
+            elif isinstance(loss_info_to_use, dict):
+                loss = {}
+                for loss_name, loss_params in sorted(loss_info_to_use.items()):
+                    if loss_name != "__weight__":
+                        loss[loss_name] = get_single_loss(loss_params["name"], loss_params.get("params", {}), *additional_modules)
+                loss = torch.nn.ModuleDict(loss)
+                loss.__weight__ = loss_info_to_use.get("__weight__", torch.ones(len(loss)))
+            else:
+                raise NotImplementedError
+            
+            # Aggiungi loss alla lista per questo split
+            losses[split_name].append(loss)
+
+        losses[split_name] = torch.nn.ModuleList(losses[split_name])
+    losses = utils.RobustModuleDict(losses)
+    return losses
 
 def get_single_loss(loss_name, loss_params, *additional_modules):
     return get_function(loss_name, *additional_modules, custom_losses, torch.nn)(**loss_params)
@@ -309,6 +334,13 @@ def prepare_optimizer(name, params={}, seed=42):
     pl.seed_everything(seed, verbose=False) # Seed the random number generator
     # Return a lambda function that creates an optimizer based on the provided name and parameters
     return lambda model_params: getattr(torch.optim, name)(model_params, **params)
+
+def prepare_scheduler(scheduler_info, seed=42, *additional_modules):
+    name = scheduler_info["name"]
+    params = scheduler_info.get("params", {})
+    pl.seed_everything(seed, verbose=False) # Seed the random number generator
+    # Return a lambda function that creates a scheduler based on the provided name and parameters
+    return lambda optimizer: get_function(name, *additional_modules, torch.optim.lr_scheduler)(optimizer, **params)
 
 def prepare_model(model_cfg):
     # Seed the random number generator for weight initialization
@@ -466,6 +498,9 @@ def complete_prepare_model(cfg, main_module, *additional_modules, model_params=N
 
     # Prepare the optimizer using configuration from cfg
     model_params["optimizer"] = prepare_optimizer(**model_params["optimizer"])
+
+    # Prepare the scheduler using configuration from cfg
+    model_params["scheduler"] = prepare_scheduler(model_params["scheduler"], *[getattr(module,"schedulers",module) for module in additional_modules])
 
     # Prepare the metrics using configuration from cfg
     model_params["metrics"] = prepare_metrics(model_params["metrics"], *[getattr(module,"metrics",module) for module in additional_modules])
