@@ -394,7 +394,8 @@ def densify_index_method(df: pd.DataFrame, vars=["uid", "sid"]):
     print('-------- Densifying index --------')
     maps = {}
     for var_name in tqdm(vars):
-        maps[var_name] = {u: i + 1 for i, u in enumerate(set(df[var_name]))}
+        uniques = sorted(df[var_name].unique())  # sorted instead of appearance order
+        maps[var_name] = {u: i + 1 for i, u in enumerate(uniques)}
         df[var_name] = df[var_name].map(maps[var_name])
     return df, maps
 
