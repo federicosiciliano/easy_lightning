@@ -63,7 +63,7 @@ def prepare_rec_dataloaders(cfg, data, maps=None, data_params=None, collator_par
     return loaders
 
 
-def prepare_rec_model(cfg, maps=None, data_params=None, rec_model_params=None):
+def prepare_rec_model(cfg, maps=None, data_params=None, rec_model_params=None, additional_module=None):
     """
         Prepares and instantiates a recommendation model using the given configuration.
 
@@ -100,7 +100,7 @@ def prepare_rec_model(cfg, maps=None, data_params=None, rec_model_params=None):
     if "lookback" not in rec_model_params:
         rec_model_params["lookback"] = data_params["collator_params"]["lookback"]
 
-    main_module = rec_torch.create_rec_model(**rec_model_params)#, graph=easy_rec.data_generation_utils.get_graph_representation(data["train_sid"]))
+    main_module = rec_torch.create_rec_model(**rec_model_params, additional_module=additional_module)#, graph=easy_rec.data_generation_utils.get_graph_representation(data["train_sid"]))
     
     return main_module
 
