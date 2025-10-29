@@ -142,7 +142,8 @@ def preprocess_dataset(
         df, maps = densify_index_method(df)
         user_sequences_with_time = df.groupby("uid").apply(
         lambda g: (list(g.sort_values("timestamp")["sid"]),
-                   list(g.sort_values("timestamp")["timestamp"]))).to_dict()
+                   list(g.sort_values("timestamp")["timestamp"])),
+        include_groups=False).to_dict()
     print_stats(user_sequences_with_time, keep_time=True)
 
     data = df_to_sequences(df)
@@ -404,9 +405,10 @@ def df_to_sequences(df: pd.DataFrame, keep_vars=["uid"], seq_vars=["sid", "ratin
     df_group_by_user = df.groupby(user_var)
     data = {}
     for var in seq_vars:
-        data[var] = df_group_by_user.apply(lambda d: list(d.sort_values(by=time_var)[var])).values
+        data[var] = df_group_by_user.apply(lambda d: list(d.sort_values(by=time_var)[var]),
+                                            include_groups=False).values
     for var in keep_vars:
-        data[var] = df_group_by_user.apply(lambda d: list(d[var])[0]).values
+        data[var] = df_group_by_user[var].first().values
     return data
 
 
