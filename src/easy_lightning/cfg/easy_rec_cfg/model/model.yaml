@@ -11,6 +11,8 @@ optimizer:
       #     upper: 1.0e-1
     # betas: [0.9, 0.98]
 
+scheduler: null
+
 loss: SequentialBCEWithLogitsLoss #SequentialCrossEntropyLoss #SequentialBPR #SequentialBCEWithLogitsLoss
 # loss:
 #   gbce_loss:

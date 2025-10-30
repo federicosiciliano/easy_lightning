@@ -500,7 +500,8 @@ def complete_prepare_model(cfg, main_module, *additional_modules, model_params=N
     model_params["optimizer"] = prepare_optimizer(**model_params["optimizer"])
 
     # Prepare the scheduler using configuration from cfg
-    model_params["scheduler"] = prepare_scheduler(model_params["scheduler"], *[getattr(module,"schedulers",module) for module in additional_modules])
+    if model_params["scheduler"] is not None:
+        model_params["scheduler"] = prepare_scheduler(model_params["scheduler"], *[getattr(module,"schedulers",module) for module in additional_modules])
 
     # Prepare the metrics using configuration from cfg
     model_params["metrics"] = prepare_metrics(model_params["metrics"], *[getattr(module,"metrics",module) for module in additional_modules])
