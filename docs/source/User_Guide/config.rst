@@ -22,7 +22,6 @@ Each section of the YAML file corresponds to a major component of the pipeline, 
 This structured configuration ensures consistency, reusability, and clarity across projects, making it easy to scale or adapt experiments to new scenarios with minimal effort.
 
 
-
 **Note**:
 Both **Easy Torch** and **Easy Rec** support seamless integration with **PyTorch** and **PyTorch Lightning**. Models, checkpoints, loss functions, and metrics can be directly referenced from these frameworks using string-based import paths in the YAML configuration (e.g., ``CrossEntropyLoss``). This design provides full flexibility and extensibility while maintaining the simplicity of EasyLightning's unified configuration system.
 
@@ -39,6 +38,37 @@ Easy Torch
    :maxdepth: 4
 
    easy_torch_config
+
+
+Common Features
+----------------
+
+1. **Optimizer**
+
+   You can specify any optimizer available in PyTorch by providing its import path as a string in the configuration file.
+
+   **Example:**
+
+   ::
+
+       optimizer:
+           name: Adam
+           params:
+               lr: 0.001
+
+2. **Scheduler**
+
+   Similar to optimizers, you can define any learning rate scheduler from PyTorch by specifying its import path.
+
+   **Example:**
+
+   ::
+
+       scheduler:
+           name: StepLR
+           params:
+               step_size: 10
+               gamma: 0.1
 
 Special Characters
 ------------------

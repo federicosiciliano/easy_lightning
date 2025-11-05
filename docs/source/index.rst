@@ -38,12 +38,13 @@ So far, we've developed EasyTorch and EasyRec. If you'd like to help us develop 
    User_Guide/easy_torch_config
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 0
    :caption: Developer Guide
 
    Developer_Guide/custom_metrics
    Developer_Guide/custom_losses
    Developer_Guide/custom_dataset
+   Developer_Guide/custom_callback
 
 .. toctree::
    :maxdepth: 1

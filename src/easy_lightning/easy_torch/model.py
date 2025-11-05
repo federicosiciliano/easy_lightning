@@ -109,11 +109,14 @@ class BaseNN(pl.LightningModule):
         """
         Configure the optimizer(s) and learning rate scheduler(s) for the model.
 
-        Returns:
-            dict: A dictionary containing the optimizer and optionally the learning rate scheduler.
+        Returns
+        -------
+        dict
+            A dictionary containing the optimizer and optionally the learning rate scheduler.
             The dictionary can contain:
-                - "optimizer": The optimizer instance.
-                - "lr_scheduler": A dictionary or callable for the learning rate scheduler.
+            
+            - "optimizer": The optimizer instance.
+            - "lr_scheduler": A dictionary or callable for the learning rate scheduler.
         """
         optimizer = self.optimizer(self.parameters())
 
