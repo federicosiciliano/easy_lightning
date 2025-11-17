@@ -5,8 +5,10 @@ import pytorch_lightning as pl
 import torchmetrics
 from copy import deepcopy
 from torch.utils.data import DataLoader, TensorDataset
+from torch.optim.lr_scheduler import LambdaLR, SequentialLR
 #import wandb
 import os
+import math
 
 from ray.train.lightning import prepare_trainer as prepare_ray_trainer
 import ray.train.lightning as ray_lightning
@@ -338,9 +340,72 @@ def prepare_optimizer(name, params={}, seed=42):
 def prepare_scheduler(scheduler_info, seed=42, *additional_modules):
     name = scheduler_info["name"]
     params = scheduler_info.get("params", {})
-    pl.seed_everything(seed, verbose=False) # Seed the random number generator
-    # Return a lambda function that creates a scheduler based on the provided name and parameters
-    return lambda optimizer: get_function(name, *additional_modules, torch.optim.lr_scheduler)(optimizer, **params)
+    # Seed the random number generator
+    if "warmup_params" not in scheduler_info.keys():
+        # Return a lambda function that creates a scheduler based on the provided name and parameters
+        return lambda optimizer: get_function(name, *additional_modules, torch.optim.lr_scheduler)(optimizer, **params)
+    # when there is a warmup
+    else:
+        wcfg = scheduler_info["warmup_params"]
+
+        warmup_epochs = wcfg.get("epochs", 0)
+        warmup_type   = wcfg.get("type", "linear")     # linear / constant / exponential / cosine / custom
+        start_factor  = wcfg.get("start_factor", 0.0)  # where warmup starts
+        end_factor    = wcfg.get("end_factor", 1.0)    # where warmup ends
+        custom_func   = wcfg.get("function", None)     # user-specified function(epoch, warmup_epochs)
+
+        def create_scheduler(optimizer):
+
+            # -------------------------------
+            # Warmup lambda (general)
+            # -------------------------------
+            def warmup_lambda(epoch):
+
+                # Allow fully custom warmup
+                if custom_func is not None:
+                    return custom_func(epoch, warmup_epochs)
+
+                # Linear warmup
+                elif warmup_type == "linear":
+                    t = epoch / float(max(1, warmup_epochs))
+                    return start_factor + (end_factor - start_factor) * t
+
+                # Constant warmup (flat)
+                elif warmup_type == "constant":
+                    return start_factor
+
+                # Exponential: start → end
+                elif warmup_type == "exponential":
+                    t = epoch / float(max(1, warmup_epochs))
+                    return start_factor * ((end_factor / start_factor) ** t)
+
+                # Cosine warmup
+                elif warmup_type == "cosine":
+                    t = epoch / float(max(1, warmup_epochs))
+                    return start_factor + (end_factor - start_factor) * (
+                        0.5 * (1 - math.cos(math.pi * t))
+                    )
+                else:
+                    raise NotImplementedError(f"Unsupported warmup type: {warmup_type}. Please select from ['linear', 'constant', 'exponential', 'cosine', 'custom']")
+
+            # Warmup scheduler
+            warmup_sched = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=warmup_lambda)
+
+            # Main scheduler from PyTorch
+            main_sched = get_function(
+                name, *additional_modules, torch.optim.lr_scheduler
+            )(optimizer, **params)
+
+            # Chain warmup + main
+            return torch.optim.lr_scheduler.SequentialLR(
+                optimizer,
+                schedulers=[warmup_sched, main_sched],
+                milestones=[warmup_epochs]
+            )
+
+        return create_scheduler
+
+
 
 def prepare_model(model_cfg):
     # Seed the random number generator for weight initialization
