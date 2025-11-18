@@ -58,17 +58,20 @@ Common Features
 
 2. **Scheduler**
 
-   Similar to optimizers, you can define any learning rate scheduler from PyTorch by specifying its import path.
+   Similar to optimizers, you can define any learning rate scheduler from PyTorch by specifying its import path. You can also use warmup schedulers by adding a `warmup_params` section.
 
    **Example:**
 
    ::
 
        scheduler:
-           name: StepLR
-           params:
+            name: StepLR
+            params:
                step_size: 10
                gamma: 0.1
+            warmup_params: [optional]
+               type: linear
+               epochs: 5
 
 Special Characters
 ------------------

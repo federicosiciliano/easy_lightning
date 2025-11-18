@@ -356,9 +356,6 @@ def prepare_scheduler(scheduler_info, seed=42, *additional_modules):
 
         def create_scheduler(optimizer):
 
-            # -------------------------------
-            # Warmup lambda (general)
-            # -------------------------------
             def warmup_lambda(epoch):
 
                 # Allow fully custom warmup
