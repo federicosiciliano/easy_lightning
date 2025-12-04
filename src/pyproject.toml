@@ -1,7 +1,7 @@
 [project]
 name = "easy_lightning"
 description = "Easy Lightning: Simplify AI-Deep learning with PyTorch Lightning"
-version = "1.0.3"
+version = "1.0.4"
 authors = [
   { name="Filippo Betello", email="betello@diag.uniroma1.it" },
   { name="Maria Diana Calagaru", email="calagaru@diag.uniroma1.it" },
@@ -29,7 +29,7 @@ dependencies = [
   "protobuf>=6.31.1",
   "pyOpenSSL>=25.1.0",
   "pytorch_lightning>=2.5.2",
-  "ray>=2.47.1",
+  "ray==2.40.0",
   "redis>=6.2.0",
   "scikit_learn>=1.6.0",
   "Sphinx>=7.4.0",
