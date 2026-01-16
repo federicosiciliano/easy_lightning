@@ -19,6 +19,7 @@ class DictDataset(torch.utils.data.Dataset):
     """
     # Constructor to initialize the dataset with input data
     def __init__(self, data):
+
         self.data = data
 
         # Convert each value in the data dictionary to a PyTorch tensor
@@ -121,7 +122,7 @@ class DictDataset(torch.utils.data.Dataset):
 #TODO: move this into easy_torch
 class SequentialCollator:
     """
-        A collator forfor preparing sequential input-output pairs with configurable lookback, lookforward, and simultaneous steps.
+        A collator for preparing sequential input-output pairs with configurable lookback, lookforward, and simultaneous steps.
         
         Args:
             sequential_keys (list): List of keys in the batch data that represent sequential features.
@@ -145,6 +146,7 @@ class SequentialCollator:
                  simultaneous_lookback = 0,
                  out_seq_len=None,
                  keep_last = None,
+                 stride=1,
                  drop_original=True):
         
         self.sequential_keys = sequential_keys
@@ -160,6 +162,8 @@ class SequentialCollator:
         self.keep_last = keep_last
         if keep_last is None:
             self.keep_last = lookback
+        
+        self.stride = stride
 
         self.drop_original = drop_original
 
@@ -330,7 +334,14 @@ class SequentialCollator:
         #.int() floors the number, so max_len can't be selected (good, cause is out of bounds)
         # Generate random indices for output sequences
         rand = torch.randint(2**63 - 1, size=(len(seq_lens),))
-        current_index = (rand % (input_poss_end_ids - input_poss_start_ids) + input_poss_start_ids).int()
+        # current_index = (rand % (input_poss_end_ids - input_poss_start_ids) + input_poss_start_ids).int()
+        span = input_poss_end_ids - input_poss_start_ids
+        num_positions = torch.clamp(span // self.stride, min=1)
+
+        rand = torch.randint(0, num_positions.max(), size=(len(seq_lens),))
+        current_index = input_poss_start_ids + rand * self.stride
+        current_index = torch.minimum(current_index, input_poss_end_ids - 1)
+
         
         if (current_index < 0).any():
             raise ValueError("Some current index is negative")
@@ -753,7 +764,7 @@ def prepare_rec_datasets(data,
                 data_to_use[key] = data[f"{split_name}_{key}"]
 
         # Create the Dataset
-        datasets[split_name] = easy_lightning.easy_torch.datasets.DictDataset(data_to_use, **split_dataset_params)
+        datasets[split_name] = DictDataset(data_to_use, **split_dataset_params)  #easy_lightning.easy_torch.datasets.DictDataset(data_to_use, **split_dataset_params)
 
     return datasets
 
@@ -793,6 +804,7 @@ def prepare_rec_collators(split_keys = ["train", "val", "test"],
         # original_seq = {k:v for k,v in zip(data[orig_seq_id],data[orig_seq_key])}
 
         # Create the DataCollator
+
         collators[split_name] = collator_class(**split_collator_params)
 
     return collators

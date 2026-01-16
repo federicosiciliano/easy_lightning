@@ -180,3 +180,4 @@ cython_debug/
 #.idea/
 src/dist
 src/*.egg-info/
+src/easy_lightning/data/*

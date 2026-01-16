@@ -22,7 +22,7 @@ collator_params:
   sequential_keys: [sid] #timestamp, rating #the sequential keys of the dataset
   padding_value: 0 #the padding value for the dataset
   £lookback: #the lookback of the dataset
-    default: 10
+    default: 100
     values: [5] #, 10, 20]
     # tune:
     #   name: choice

@@ -13,6 +13,7 @@ class DictDataset(torch.utils.data.Dataset):
     # Constructor to initialize the dataset with input data
     def __init__(self, data):
         self.data = data
+        
 
     # Method to get an item from the dataset at a given index
     def __getitem__(self, index):

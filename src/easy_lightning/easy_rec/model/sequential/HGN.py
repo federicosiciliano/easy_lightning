@@ -3,7 +3,7 @@ import torch
 class HGN(torch.nn.Module):
     def __init__(self, lookback, emb_size, num_items, num_users, **kwargs):
         super(HGN, self).__init__()
-
+        
         self.user_embeddings = torch.nn.Embedding(num_users+1, emb_size) #+1 because of padding
         self.in_item_embeddings = torch.nn.Embedding(num_items+1, emb_size, padding_idx=0) #+1 because of padding
 

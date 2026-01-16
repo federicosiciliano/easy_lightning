@@ -37,8 +37,6 @@ dependencies = [
   "torchvision>=0.22.1",
   "pyarrow>=21.0.0",
   "wandb>=0.21.0",
-
-
 ]
 
 [project.scripts]
