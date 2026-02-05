@@ -1,0 +1,8 @@
+name: resnet18 #34
+#+ backend: torch
+
+#num_parameters: [1,10,100,200,1000]
+
+
+#seed: ${exp.seed}
+

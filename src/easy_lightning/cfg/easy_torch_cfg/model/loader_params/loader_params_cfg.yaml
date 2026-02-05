@@ -1,0 +1,21 @@
+/num_workers: 1 #for prototyping
+
+# /persistent_workers: True #for real runs
+/persistent_workers: False #for prototype
+
+# /pin_memory: True #for real runs
+/pin_memory: False #for prototype
+
+
+batch_size: 
+  train: 512
+  train_test: 512 
+  val: 512
+  test: 512
+
+drop_last: False
+shuffle:
+  train: True
+  train_test: False 
+  val: False
+  test: False

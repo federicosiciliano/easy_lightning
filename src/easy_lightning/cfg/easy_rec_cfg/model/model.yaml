@@ -1,0 +1,80 @@
+optimizer:
+  name: Adam
+  params:
+    £lr:
+      default: 1.0e-3
+      values: [1.0e-1] #, 1.0e-2, 1.0e-3, 1.0e-4, 1.0e-5]
+      # tune:
+      #   name: uniform #loguniform
+      #   params:
+      #     lower: 1.0e-5
+      #     upper: 1.0e-1
+    # betas: [0.9, 0.98]
+
+scheduler: null
+
+
+loss: SequentialBCEWithLogitsLoss #SequentialCrossEntropyLoss #SequentialBPR #SequentialBCEWithLogitsLoss
+# loss:
+#   gbce_loss:
+#     name: SequentialGeneralizedBCEWithLogitsLoss
+#     params:
+#       beta: 0.5
+
+metrics:
+  - FakeMetricCollection:Precision
+  - FakeMetricCollection:Recall
+  - FakeMetricCollection:NDCG
+  - FakeMetricCollection:MRR
+  - FakeMetricCollection:BatchLength
+
+metrics:
+  - FakeMetricCollection:Precision
+  - FakeMetricCollection:Recall
+  - FakeMetricCollection:NDCG
+  - FakeMetricCollection:MRR
+
+log_params:
+  on_epoch: True
+  on_step: False
+
+/step_routing:
+  model_input_from_batch: [in_sid, out_sid]
+  loss_input_from_model_output:
+    input: null
+  loss_input_from_batch:
+    target: relevance
+  metrics_input_from_batch:
+    Precision:
+      relevance: relevance
+    Recall:
+      relevance: relevance
+    NDCG:
+      relevance: relevance
+    MRR:
+      relevance: relevance
+  metrics_input_from_model_output:
+    scores: null
+
+emission_tracker:
+  use: False
+  tracking_mode: process
+  log_level: critical
+  /output_dir: ${__exp__.project_folder}out/log/${__exp__.name}/
+
+flops_profiler:
+  use: False
+  /output_dir: ${__exp__.project_folder}out/log/${__exp__.name}/
+
++loader_params: loader_params_cfg
+
++trainer_params: trainer_params_cfg
+
+# +emission_tracker: emission_tracker_cfg
+
+# +flops_profiler: flops_profiler_cfg
+
++rec_model: HGN #GRU4Rec #SASRec
+
+# __global__:
+#   model.rec_model.seed: 42
